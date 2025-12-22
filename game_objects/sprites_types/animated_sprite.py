@@ -8,7 +8,7 @@ class AnimatedSprite(SimpleSprite):
     _frame_number: int
     _images: list[pg.Surface]
 
-    def __init__(self, width: int, height: int, images: list[pg.Surface]):
+    def __init__(self, width: int, height: int, images: list[str]):
         super().__init__(width, height)
 
         if not isinstance(width, int) or not isinstance(height, int):
@@ -17,7 +17,12 @@ class AnimatedSprite(SimpleSprite):
         if not isinstance(images, list):
             raise TypeError("Images list must be a list")
 
-        self._images = images
+        if images != []:
+            self._images = [
+                pg.image.load(image_path)
+                for image_path in images
+                if image_path != "" and image_path is not None
+            ]
 
     def update(self, *args, **kwargs):
         for frame in it.cycle(self._images):
