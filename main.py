@@ -7,7 +7,6 @@ screen = pg.display.set_mode((500, 500))
 clock = pg.time.Clock()
 
 sp_ss = gameObject.SimpleSprite(50, 50, pg.Color(0, 255, 0))
-ss = gameObject.GameObject(screen, sp_ss, gameObject.Point(25, 25))
 
 running = True
 while running:
@@ -24,7 +23,7 @@ while running:
             ss.set_position(pos)
 
     screen.fill(pg.Color(255, 0, 0))
-    ss.render()
+    screen.blit(sp_ss.image, sp_ss.Rect)
 
     pg.display.flip()
     clock.tick(60)
