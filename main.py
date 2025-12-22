@@ -1,29 +1,33 @@
 import pygame as pg
-import game_objects.gameObject as gameObject
+
+from utility_classes.point import Point
+
+from game_objects import ClickableObject, SimpleSprite
+
 
 pg.init()
 
 screen = pg.display.set_mode((500, 500))
 clock = pg.time.Clock()
 
-sp_ss = gameObject.SimpleSprite(50, 50, pg.Color(0, 255, 0))
+sp_ss = SimpleSprite(50, 50, pg.Color(0, 0, 255))
+sp_clk = SimpleSprite(50, 50, pg.Color(0, 255, 255))
+
+ss = ClickableObject(screen, sp_ss, sp_clk, Point(50, 50))
 
 running = True
 while running:
     for event in pg.event.get():
-        print(event, event.type)
         if event.type == pg.QUIT:
             running = False
         elif event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
             print("Presssed Space")
-            pos = ss.get_position()
-            pos.x += 50
-            pos.y += 10
-
-            ss.set_position(pos)
+            ss.click()
 
     screen.fill(pg.Color(255, 0, 0))
-    screen.blit(sp_ss.image, sp_ss.Rect)
+
+    ss.detect()
+    ss.render()
 
     pg.display.flip()
     clock.tick(60)

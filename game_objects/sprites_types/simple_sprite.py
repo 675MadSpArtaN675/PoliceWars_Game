@@ -2,7 +2,7 @@ import pygame as pg
 
 
 class SimpleSprite(pg.sprite.Sprite):
-    __resourse_image: str
+    __resourse_image: str = None
     _color: pg.Color
 
     _image: pg.Surface
@@ -20,7 +20,7 @@ class SimpleSprite(pg.sprite.Sprite):
         self._image = pg.Surface((width, height))
         self._rect = self._image.get_rect()
 
-        if image_path.strip() == "" or image_path is None:
+        if image_path is not None and image_path.strip() != "":
             self.__resourse_image = pg.image.load(image_path)
 
         self._color = color

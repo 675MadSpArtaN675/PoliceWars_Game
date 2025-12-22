@@ -17,7 +17,7 @@ class AnimatedSprite(SimpleSprite):
         if not isinstance(images, list):
             raise TypeError("Images list must be a list")
 
-        if images != []:
+        if images != [] and images is not None:
             self._images = [
                 pg.image.load(image_path)
                 for image_path in images
