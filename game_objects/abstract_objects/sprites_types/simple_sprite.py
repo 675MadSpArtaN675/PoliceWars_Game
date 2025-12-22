@@ -26,11 +26,11 @@ class SimpleSprite(pg.sprite.Sprite):
         self._color = color
 
     @property
-    def Image(self):
+    def image(self):
         return self._image
 
     @property
-    def Rect(self):
+    def rect(self):
         return self._rect
 
     def update(self, *args, **kwargs):

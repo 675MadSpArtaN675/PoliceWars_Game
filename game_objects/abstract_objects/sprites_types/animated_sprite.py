@@ -1,4 +1,4 @@
-from simple_sprite import SimpleSprite
+from .simple_sprite import SimpleSprite
 
 import pygame as pg
 import itertools as it
