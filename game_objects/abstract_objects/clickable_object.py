@@ -7,11 +7,15 @@ import pygame as pg
 
 
 class ClickableObject(GameObject):
+    _type = "clickable_object"
+    _display_name = "GameObject"
+
     _secondary_sprite: SimpleSprite = None
 
     _cursor_on_object: bool = False
     _once_enter: bool = False
     _one_render: bool = False
+    _clicked: bool = False
 
     _on_click: Callable = None
     _on_enter: Callable = None
@@ -24,8 +28,9 @@ class ClickableObject(GameObject):
         secondary_sprite: SimpleSprite,
         /,
         position: Point = Point(),
+        depth: int = 0,
     ):
-        super().__init__(screen, sprite, position)
+        super().__init__(screen, sprite, position=position, depth=depth)
 
         if secondary_sprite is not None:
             self._secondary_sprite = secondary_sprite
@@ -45,8 +50,14 @@ class ClickableObject(GameObject):
         self._on_exit = function
 
     def click(self):
+        self.__clicked = False
+
         if self._on_click is not None:
             self._on_click()
+            self.__clicked = True
+
+    def is_clicked(self):
+        return self._clicked
 
     def render(self):
         if self._once_enter and not self._one_render:
@@ -66,8 +77,8 @@ class ClickableObject(GameObject):
     def __is_cursor_on_plane(self, x: int | float, y: int | float):
         coordinate = self.get_position()
 
-        width = self._sprite.Rect.width
-        height = self._sprite.Rect.height
+        width = self._sprite.rect.width
+        height = self._sprite.rect.height
 
         is_cursor_x_in_zone = x > coordinate.x and x < coordinate.x + width
         is_cursor_y_in_zone = y > coordinate.y and y < coordinate.y + height

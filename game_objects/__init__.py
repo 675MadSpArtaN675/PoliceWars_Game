@@ -1,9 +1,6 @@
 from .abstract_objects import sprites_types
 
-from .police_unit import Bullet, BanditUnit
+from . import units
+from .units_cell import Cell
 
-__all__ = [
-    "Bullet",
-    "BanditUnit",
-    "sprites_types",
-]
+__all__ = ["Bullet", "units", "sprites_types", "Cell"]

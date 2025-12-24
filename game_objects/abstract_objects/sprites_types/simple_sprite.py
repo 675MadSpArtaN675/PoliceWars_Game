@@ -2,6 +2,7 @@ import pygame as pg
 
 
 class SimpleSprite(pg.sprite.Sprite):
+    __image_path: str = None
     __resourse_image: str = None
     _color: pg.Color
 
@@ -17,6 +18,7 @@ class SimpleSprite(pg.sprite.Sprite):
     ):
         super().__init__()
 
+        self.__image_path = image_path
         self._image = pg.Surface((width, height))
         self._rect = self._image.get_rect()
 
@@ -46,3 +48,9 @@ class SimpleSprite(pg.sprite.Sprite):
     def set_size(self, width: int, height: int):
         self._image = pg.Surface((width, height))
         self._rect = self._image.get_rect()
+
+    def copy(self):
+        width = self._rect.width
+        height = self._rect.height
+
+        return SimpleSprite(width, height, self._color, self.__image_path)

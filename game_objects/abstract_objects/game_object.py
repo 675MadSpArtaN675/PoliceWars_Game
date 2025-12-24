@@ -11,6 +11,7 @@ import pygame as pg
 class GameObject:
     _type = "object"
     _display_name = "GameObject"
+    _depth: int = 0
     _is_dead: bool = False
 
     _on_render: Callable = None
@@ -21,12 +22,27 @@ class GameObject:
     _position: Point
 
     def __init__(
-        self, screen: pg.Surface, sprite: SimpleSprite, /, position: Point = Point()
+        self,
+        screen: pg.Surface,
+        sprite: SimpleSprite,
+        /,
+        position: Point = Point(),
+        depth: int = 0,
     ):
         self._position = position
 
         self._screen_to_render = screen
         self._sprite = sprite
+
+        self._depth = depth
+
+    @property
+    def type_name(self):
+        return self._display_name
+
+    @property
+    def display_name(self):
+        return self._display_name
 
     def render(self):
         if not self._is_dead:
@@ -39,9 +55,8 @@ class GameObject:
                 self._on_render()
 
     def destroy(self):
-        if self._sprite.alive():
-            self._sprite.kill()
-            self._is_dead = True
+        self._sprite.kill()
+        self._is_dead = True
 
     @property
     def center(self):

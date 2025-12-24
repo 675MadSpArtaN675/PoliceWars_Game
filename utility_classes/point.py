@@ -14,8 +14,23 @@ class Point:
         self.x = x
         self.y = y
 
+    def __add__(self, other):
+        self.x += other.x
+        self.y += other.y
+
+        return self
+
+    def __div__(self, other):
+        self.x -= other.x
+        self.y -= other.y
+
+        return self
+
     def to_tuple(self):
         return (self.x, self.y)
+
+    def copy(self):
+        return Point(self.x, self.y)
 
     def __repr__(self):
         return f"({self.x}; {self.y})"
