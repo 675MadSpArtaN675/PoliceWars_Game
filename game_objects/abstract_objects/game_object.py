@@ -44,6 +44,10 @@ class GameObject:
     def display_name(self):
         return self._display_name
 
+    @property
+    def center(self):
+        return self._sprite.rect.center
+
     def render(self):
         if not self._is_dead:
             self._sprite.rect.x, self._sprite.rect.y = self._position.to_tuple()
@@ -58,9 +62,8 @@ class GameObject:
         self._sprite.kill()
         self._is_dead = True
 
-    @property
-    def center(self):
-        return self._sprite.rect.center
+    def is_dead(self):
+        return self._is_dead
 
     def get_object_type(self):
         return self._type
@@ -94,6 +97,12 @@ class GameObject:
 
     def get_sprite(self):
         return self._sprite
+
+    def get_depth(self):
+        return self._depth
+
+    def set_depth(self, value: int):
+        self._depth = value
 
     def copy(self):
         object_copy = GameObject(

@@ -1,6 +1,6 @@
 from game_objects.units import MeleeUnit, GunnerUnit
 
-from .objects_data import UnitData, UnitType
+from ..objects_data import UnitData, UnitType
 
 import pygame as pg
 

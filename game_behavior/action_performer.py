@@ -1,0 +1,23 @@
+from typing import Callable
+from game_objects.abstract_objects import GameObject
+
+
+class ActionPerformer:
+    _objects: list[GameObject]
+
+    func_performer: Callable[[GameObject], None]
+
+    def __init__(self):
+        self._objects = []
+
+    @property
+    def objects(self):
+        return tuple(self._objects)
+
+    @objects.setter
+    def objects(self, value: list[GameObject]):
+        self._objects = value
+
+    def perform(self):
+        for object_ in self._objects:
+            self._func_performer(object_)

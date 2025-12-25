@@ -42,6 +42,10 @@ class UnitGrid(GameObject):
     def __validate_key(self, key):
         return key > 1 and key <= self._cell_count
 
+    def detect(self):
+        for line in self._grid:
+            line.detect()
+
     def render(self):
         for line in self._grid:
             line.render()

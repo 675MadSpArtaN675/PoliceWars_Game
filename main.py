@@ -1,36 +1,28 @@
-import pygame as pg
+from game_behavior import (
+    GameLoopController,
+    TextureLoader,
+    EventPerformer,
+    KeyEventPerformer,
+)
+from game_behavior.painters import StandartPainter
+
+from game_objects.abstract_objects import GameObject, ClickableObject
+from game_objects.sprites_types import SimpleSprite
 
 from utility_classes.point import Point
+from utility_classes.size import Size
 
-from game_objects.abstract_objects import ClickableObject
-from game_objects.sprites_types import SimpleSprite
-from game_objects.map_structure_object import UnitLine, Cell, UnitGrid
+import pygame as pg
 
-pg.init()
 
-screen = pg.display.set_mode((800, 700))
-clock = pg.time.Clock()
+event_listener = EventPerformer()
+key_listener = KeyEventPerformer()
 
-grid = UnitGrid(screen, 10, 10, Point(10, 10), -5)
-grid.cell_sprite = SimpleSprite(50, 50)
-grid.selected_cell_sprite = SimpleSprite(50, 50, pg.Color(0, 0, 255))
+game = GameLoopController(Size(1024, 768))
+texture_loader = TextureLoader("resources")
+game.init_loop()
 
-grid.build()
 
-delete_mode = False
-running = True
-while running:
-    delta_time = clock.get_time() / 1000
+game.start_cycle()
 
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            running = False
-
-    screen.fill(pg.Color(255, 0, 0))
-
-    grid.render()
-
-    pg.display.flip()
-    clock.tick(60)
-
-pg.quit()
+game.exit()

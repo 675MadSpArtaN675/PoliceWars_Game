@@ -34,9 +34,12 @@ class UnitLine(GameObject):
         else:
             raise TypeError("Incorrect Type for any sprites")
 
-    def render(self):
+    def detect(self):
         for cell in self._unit_cells:
             cell.detect()
+
+    def render(self):
+        for cell in self._unit_cells:
             cell.render()
 
     def build(self):
