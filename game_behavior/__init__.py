@@ -7,6 +7,8 @@ from .action_performer import ActionPerformer
 
 from .texture_loader import TextureLoader
 
+from .object_creator import ObjectCreator
+
 from . import objects_data
 from . import painters
 
@@ -18,6 +20,7 @@ __all__ = [
     "ActionPerformer",
     "TextureLoader",
     "GameLoopController",
+    "ObjectCreator",
     "objects_data",
     "painters",
 ]

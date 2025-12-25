@@ -1,4 +1,8 @@
+from utility_classes.size import Size
+
 import pygame as pg
+
+import pathlib as pl
 
 
 class SimpleSprite(pg.sprite.Sprite):
@@ -54,3 +58,11 @@ class SimpleSprite(pg.sprite.Sprite):
         height = self._rect.height
 
         return SimpleSprite(width, height, self._color, self.__image_path)
+
+
+def load_sprite(path_to_image: str, size: Size):
+    path_image = pl.Path(path_to_image).absolute()
+    image = pg.image.load(path_image)
+    transformed_image = pg.transform.scale(image, size.to_tuple())
+
+    return SimpleSprite(*size, image_path=transformed_image)
