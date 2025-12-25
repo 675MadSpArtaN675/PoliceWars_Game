@@ -1,7 +1,7 @@
 from utility_classes.point import Point
 from utility_classes.size import Size
 
-from .sprites_types.simple_sprite import SimpleSprite
+from ..sprites_types import SimpleSprite
 
 from typing import Callable
 
@@ -11,7 +11,6 @@ import pygame as pg
 class GameObject:
     _type = "object"
     _display_name = "GameObject"
-    _depth: int = 0
     _is_dead: bool = False
 
     _on_render: Callable = None
@@ -20,6 +19,7 @@ class GameObject:
     _sprite: SimpleSprite
 
     _position: Point
+    _depth: int = 0
 
     def __init__(
         self,
@@ -94,3 +94,22 @@ class GameObject:
 
     def get_sprite(self):
         return self._sprite
+
+    def copy(self):
+        object_copy = GameObject(
+            self._screen_to_render,
+            self._sprite.copy(),
+            position=self._position.copy(),
+            depth=self._depth,
+        )
+
+        self._copy_protected_attrs(object_copy)
+
+        return object_copy
+
+    def _copy_protected_attrs(self, object_copy: object):
+        attrs = ["_on_render", "_is_dead"]
+
+        for attribute in attrs:
+            self_attr_value = getattr(self, attribute)
+            setattr(object_copy, self_attr_value)

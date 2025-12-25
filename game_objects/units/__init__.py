@@ -1,4 +1,5 @@
-from .gunner import GunnerUnit
 from .melee import MeleeUnit
+from .gunner import GunnerUnit
+from .bullet import Bullet
 
-__all__ = ["MeleeUnit", "GunnerUnit"]
+__all__ = ["MeleeUnit", "GunnerUnit", "Bullet"]

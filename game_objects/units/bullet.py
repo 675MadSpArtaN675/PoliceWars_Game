@@ -1,11 +1,11 @@
-from ..abstract_objects.sprites_types import SimpleSprite
-from ..abstract_objects.unit import Unit
+from ..sprites_types import SimpleSprite
+from .melee import MeleeUnit
 from utility_classes.point import Point
 
 import pygame as pg
 
 
-class Bullet(Unit):
+class Bullet(MeleeUnit):
     _type = "projectile"
     _display_name = "Bullet"
 

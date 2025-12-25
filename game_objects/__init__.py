@@ -1,6 +1,6 @@
-from .abstract_objects import sprites_types
-
+from . import sprites_types
 from . import units
-from .units_cell import Cell
 
-__all__ = ["Bullet", "units", "sprites_types", "Cell"]
+from . import map_structure_object
+
+__all__ = ["sprites_types", "units", "map_structure_object"]

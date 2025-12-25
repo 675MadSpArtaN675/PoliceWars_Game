@@ -2,28 +2,20 @@ import pygame as pg
 
 from utility_classes.point import Point
 
-from game_objects.abstract_objects.sprites_types import SimpleSprite
-from game_objects.abstract_objects import Bullet
-
-from game_objects.units import MeleeUnit, GunnerUnit
-from game_objects import Cell
-
+from game_objects.abstract_objects import ClickableObject
+from game_objects.sprites_types import SimpleSprite
+from game_objects.map_structure_object import UnitLine, Cell, UnitGrid
 
 pg.init()
 
-screen = pg.display.set_mode((500, 500))
+screen = pg.display.set_mode((800, 700))
 clock = pg.time.Clock()
 
+grid = UnitGrid(screen, 10, 10, Point(10, 10), -5)
+grid.cell_sprite = SimpleSprite(50, 50)
+grid.selected_cell_sprite = SimpleSprite(50, 50, pg.Color(0, 0, 255))
 
-enemy = MeleeUnit(screen, SimpleSprite(50, 50), 100, 100, 15, Point(350, 100))
-cell = Cell(
-    screen,
-    SimpleSprite(50, 50, pg.Color(255, 255, 255)),
-    SimpleSprite(50, 50, pg.Color(0, 0, 255)),
-)
-
-
-policeman_buffer = None
+grid.build()
 
 delete_mode = False
 running = True
@@ -33,54 +25,10 @@ while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
-        elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_SPACE:
-                if not delete_mode:
-                    print(policeman_buffer)
-                    cell.place_unit(policeman_buffer)
-                else:
-                    cell.delete_unit()
-
-                policeman_buffer = None
-
-            elif event.key == pg.K_f:
-                delete_mode = True
-
-            elif event.key == pg.K_0:
-                policeman_buffer = GunnerUnit(
-                    screen,
-                    SimpleSprite(50, 50),
-                    SimpleSprite(20, 20),
-                    100,
-                    500,
-                    50,
-                    10,
-                    Bullet,
-                )
-
-            elif event.key == pg.K_1:
-                policeman_buffer = GunnerUnit(
-                    screen,
-                    SimpleSprite(50, 50, pg.Color(50, 50, 0)),
-                    SimpleSprite(20, 20),
-                    100,
-                    500,
-                    50,
-                    10,
-                    Bullet,
-                )
 
     screen.fill(pg.Color(255, 0, 0))
 
-    enemy.render()
-
-    cell.detect()
-    cell.render()
-
-    unit = cell.get_unit()
-
-    if unit is not None:
-        unit.render()
+    grid.render()
 
     pg.display.flip()
     clock.tick(60)

@@ -1,5 +1,5 @@
 from utility_classes.point import Point
-from .sprites_types.simple_sprite import SimpleSprite
+from ..sprites_types import SimpleSprite
 from .game_object import GameObject
 
 from typing import Callable
@@ -96,3 +96,33 @@ class ClickableObject(GameObject):
             self._once_enter = False
 
         self._cursor_on_object = is_cursor_x_in_zone and is_cursor_y_in_zone
+
+    def copy(self):
+        object_copy = ClickableObject(
+            self._screen_to_render,
+            self._sprite.copy(),
+            self._secondary_sprite.copy(),
+            position=self._position.copy(),
+            depth=self._depth,
+        )
+
+        self._copy_protected_attrs(object_copy)
+
+        return object_copy
+
+    def _copy_protected_attrs(self, object_copy: object):
+        super()._copy_protected_attrs(object_copy)
+
+        attrs = [
+            "_cursor_on_object",
+            "_once_enter",
+            "_one_render",
+            "_clicked",
+            "_on_click",
+            "_on_enter",
+            "_on_exit",
+        ]
+
+        for attribute in attrs:
+            self_attr_value = getattr(self, attribute)
+            setattr(object_copy, self_attr_value)

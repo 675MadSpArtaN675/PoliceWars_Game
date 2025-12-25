@@ -1,12 +1,13 @@
-from ..abstract_objects import Unit, Bullet
-from ..abstract_objects.sprites_types import SimpleSprite
+from .melee import MeleeUnit
+from .bullet import Bullet
+from ..sprites_types import SimpleSprite
 
 from utility_classes.point import Point
 
 import pygame as pg
 
 
-class GunnerUnit(Unit):
+class GunnerUnit(MeleeUnit):
     _type = "gunner"
     _display_name = "Gunner"
 
@@ -22,10 +23,11 @@ class GunnerUnit(Unit):
         sprite: SimpleSprite,
         bullet_sprite: SimpleSprite,
         health: int,
-        bullet_damage: int,
         speed: int,
+        bullet_damage: int,
         bullet_speed: int,
         projectile: type,
+        team: int,
         /,
         position: Point = Point(),
         depth: int = 0,
@@ -38,6 +40,7 @@ class GunnerUnit(Unit):
             health,
             bullet_damage,
             speed,
+            team,
             position=position,
             restricted_objects=restricted_objects,
             depth=depth,
@@ -62,5 +65,26 @@ class GunnerUnit(Unit):
             self._damage * damage_modifier,
             self._bullet_speed,
             position=bullet_pos,
-            restricted_objects=[PoliceUnit],
+            restricted_objects=[],
         )
+
+    def copy(self):
+        object_copy = GunnerUnit(
+            self._screen_to_render,
+            self._sprite.copy(),
+            self._secondary_sprite.copy(),
+            self._health,
+            self._speed,
+            self._damage,
+            self._bullet_speed,
+            self._bullet_type,
+            self._team,
+            position=self._position.copy(),
+            depth=self._depth,
+            bullet_spawn_position=self._bullet_spawn_position,
+            restricted_objects=self._restricted_objects,
+        )
+
+        self._copy_protected_attrs(object_copy)
+
+        return object_copy
