@@ -18,6 +18,11 @@ class ActionPerformer:
     def objects(self, value: list[GameObject]):
         self._objects = value
 
-    def perform(self):
+    def perform(self, *args):
         for object_ in self._objects:
-            self._func_performer(object_)
+            self.func_performer(object_, *args)
+
+    def remove_dead_objects(self):
+        for object_ in self._objects:
+            if object_.is_dead():
+                self._objects.remove(object_)

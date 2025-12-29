@@ -1,9 +1,10 @@
 from utility_classes.point import Point
-from .unit_textures_data import TextureData
 
 from dataclasses import dataclass
 
 from enum import IntEnum, auto
+
+import pygame as pg
 
 
 class UnitType(IntEnum):
@@ -20,7 +21,7 @@ class UnitFraction(IntEnum):
 class UnitData:
     unit_type: UnitType
     fraction: UnitFraction
-    textures: dict[str, TextureData]
+    textures: dict[str, pg.Surface]
     health: int
     damage: int
     speed: int

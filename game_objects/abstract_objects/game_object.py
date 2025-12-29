@@ -38,7 +38,7 @@ class GameObject:
 
     @property
     def type_name(self):
-        return self._display_name
+        return self._type
 
     @property
     def display_name(self):
@@ -83,11 +83,16 @@ class GameObject:
     def set_position(self, position: Point):
         self._position = position
 
+        self._sprite.rect.x = position.x
+        self._sprite.rect.y = position.y
+
     def get_position(self):
         return self._position
 
     def set_size(self, size: Size):
         self._size = size
+        self._sprite.rect.width = self._size.width
+        self._sprite.rect.height = self._size.height
 
     def get_size(self):
         return self._size
@@ -121,4 +126,4 @@ class GameObject:
 
         for attribute in attrs:
             self_attr_value = getattr(self, attribute)
-            setattr(object_copy, self_attr_value)
+            setattr(object_copy, attribute, self_attr_value)

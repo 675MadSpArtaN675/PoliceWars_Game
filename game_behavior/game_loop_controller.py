@@ -33,7 +33,6 @@ class GameLoopController:
     @key_listener.setter
     def key_listener(self, listener: KeyEventPerformer):
         if issubclass(type(listener), KeyEventPerformer):
-            listener.set_event(pg.QUIT, self._nice_quit)
             self._loop_state.key_performer = listener
 
             return
@@ -50,12 +49,34 @@ class GameLoopController:
             issubclass(type(listener), EventPerformer)
             and type(listener) != KeyEventPerformer
         ):
-            listener.set_event(pg.QUIT, self._nice_quit)
+            listener.set_event(pg.QUIT, self.nice_quit)
             self._loop_state.event_performer = listener
 
             return
 
         raise TypeError("It is not a EventPerformer or it's subclass")
+
+    @property
+    def mouse_key_event_listener(self):
+        return self._loop_state.mouse_key_performer
+
+    @mouse_key_event_listener.setter
+    def mouse_key_event_listener(self, listener: EventPerformer):
+        if issubclass(type(listener), KeyEventPerformer):
+            self._loop_state.mouse_key_performer = listener
+
+            return
+
+        raise TypeError("It is not a EventPerformer or it's subclass")
+
+    def is_delete_mode_activated(self):
+        return self._loop_state.delete_mode
+
+    def delete_mode_activate(self):
+        self._loop_state.delete_mode = True
+
+    def delete_mode_deactivate(self):
+        self._loop_state.delete_mode = False
 
     def init_loop(self):
         self._loop_state.init_loop()
@@ -79,10 +100,14 @@ class GameLoopController:
             for event in pg.event.get():
                 if event.type in [pg.KEYUP, pg.KEYDOWN]:
                     self._loop_state.key_performer.perform_event(event)
+                elif event.type in [pg.MOUSEBUTTONDOWN, pg.MOUSEBUTTONUP]:
+                    self._loop_state.mouse_key_performer.perform_event(
+                        event, event.type
+                    )
                 else:
                     self._loop_state.event_performer.perform_event(event)
 
-    def _nice_quit(self, event):
+    def nice_quit(self, event=0):
         self._loop_state.running = False
 
     def exit(self):

@@ -3,11 +3,14 @@ from game_objects.abstract_objects import GameObject
 from game_objects.sprites_types import SimpleSprite
 
 from utility_classes.point import Point
+from ..units.gunner import MeleeUnit, GunnerUnit
+from typing import Callable
 
 import pygame as pg
 
 
 class UnitLine(GameObject):
+    _func_click_performer: Callable
     _selection_sprite: SimpleSprite
 
     _cell_count: int = 0
@@ -34,6 +37,13 @@ class UnitLine(GameObject):
         else:
             raise TypeError("Incorrect Type for any sprites")
 
+    def on_click_bind(self, function: Callable):
+        self._func_click_performer = function
+
+    def click(self):
+        for cell in self._unit_cells:
+            cell.click()
+
     def detect(self):
         for cell in self._unit_cells:
             cell.detect()
@@ -44,7 +54,6 @@ class UnitLine(GameObject):
 
     def build(self):
         if self._cell_count > 0:
-            print(self._cell_count)
             self._unit_cells = []
 
             cell_size = (
@@ -61,12 +70,13 @@ class UnitLine(GameObject):
                     position=position.copy(),
                     depth=self._depth - 1,
                 )
+                cell.on_click_bind(self._func_click_performer)
 
                 self._unit_cells.append(cell)
                 position += Point(cell_size[0], 0)
 
     def __getitem__(self, key: int):
-        if key > 1 and key <= self._cell_count:
+        if key > 0 and key <= self._cell_count:
             return self._unit_cells[key - 1]
 
         raise IndexError(

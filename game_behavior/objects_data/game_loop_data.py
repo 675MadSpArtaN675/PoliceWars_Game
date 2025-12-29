@@ -14,6 +14,7 @@ class GameLoopData:
     delete_mode: bool = False
 
     key_performer: KeyEventPerformer = None
+    mouse_key_performer: KeyEventPerformer = None
     event_performer: EventPerformer = None
 
     def __init__(self, window_size: Size):

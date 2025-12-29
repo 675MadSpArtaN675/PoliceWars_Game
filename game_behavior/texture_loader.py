@@ -1,5 +1,5 @@
 from typing import Generator
-
+from game_objects.sprites_types import load_sprite
 import pathlib as pl
 
 import pygame as pg
@@ -26,8 +26,8 @@ class TextureLoader:
             if folder.is_dir():
                 texture_key = folder.name
                 textures = {
-                    str(image_file).replace(image_file.suffix, ""): pg.image.load(
-                        str(image_file.absolute())
+                    str(image_file).replace(image_file.suffix, ""): load_sprite(
+                        str(image_file)
                     )
                     for image_file in folder.iterdir()
                     if image_file.is_file() and image_file.suffix == IMAGE_FORMAT

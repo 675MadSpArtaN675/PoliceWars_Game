@@ -50,11 +50,11 @@ class ClickableObject(GameObject):
         self._on_exit = function
 
     def click(self):
-        self.__clicked = False
+        self._clicked = False
 
-        if self._on_click is not None:
+        if self._once_enter and self._on_click is not None:
             self._on_click()
-            self.__clicked = True
+            self._clicked = True
 
     def is_clicked(self):
         return self._clicked
@@ -125,4 +125,4 @@ class ClickableObject(GameObject):
 
         for attribute in attrs:
             self_attr_value = getattr(self, attribute)
-            setattr(object_copy, self_attr_value)
+            setattr(object_copy, attribute, self_attr_value)

@@ -20,6 +20,9 @@ class Point:
 
         return self
 
+    def __iadd__(self, other):
+        return self.__add__(other)
+
     def __div__(self, other):
         self.x -= other.x
         self.y -= other.y

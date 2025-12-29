@@ -16,19 +16,11 @@ class ObjectPainter(StandartPainter):
     def field_size(self, size: Size):
         self._policmans_field_size = size
 
-    def add(self, object_: GameObject):
-        if object_ is not None:
-            self._objects.append(object_)
-            self._objects = self._sort_collection(self._objects)
-
     def remove_dead_objects(self):
         super().remove_dead_objects()
 
-        self._background_objects = list(
-            self._sort_collection(
-                filter(lambda x: not x.is_dead(), self._background_objects)
-            )
-        )
+        if self._background_objects is not None:
+            self._remove_dead_objects(self._background_objects)
 
     def paint_background(self):
         if (

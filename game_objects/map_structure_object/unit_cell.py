@@ -1,6 +1,6 @@
 from ..abstract_objects import ClickableObject
 from ..sprites_types import SimpleSprite
-from ..units.gunner import MeleeUnit
+from ..units.gunner import MeleeUnit, GunnerUnit
 
 from utility_classes.point import Point
 from utility_classes.size import Size
@@ -38,8 +38,14 @@ class Cell(ClickableObject):
         if self._unit is not None:
             self._unit.render()
 
+    def click(self):
+        if self._once_enter and self._on_click is not None:
+            unit = self._on_click()
+            self.place_unit(unit)
+
     def place_unit(self, unit: MeleeUnit):
         if self._is_can_place and unit is not None and self._unit is None:
+            unit.set_position(self._position.copy())
             self._unit = unit
 
     def delete_unit(self):

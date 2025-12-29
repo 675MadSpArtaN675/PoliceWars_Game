@@ -10,6 +10,8 @@ class MeleeUnit(ClickableObject):
     _display_name = "MeleeUnit"
 
     _is_invicible: bool = False
+    _is_can_attack: bool = True
+    _is_can_move: bool = True
 
     _health: int
     _damage: int
@@ -39,6 +41,22 @@ class MeleeUnit(ClickableObject):
         self._team = team
 
     @property
+    def is_can_move(self):
+        return self._is_can_move
+
+    @is_can_move.setter
+    def is_can_move(self, value: bool):
+        self._is_can_move = value
+
+    @property
+    def is_can_attack(self):
+        return self._is_can_attack
+
+    @is_can_attack.setter
+    def is_can_attack(self, value: bool):
+        self._is_can_attack = value
+
+    @property
     def team(self):
         return self._team
 
@@ -50,11 +68,12 @@ class MeleeUnit(ClickableObject):
     def health(self):
         return self._health
 
-    def move(self, delta_time):
-        now_position = self.get_position()
+    def move(self, delta_time: int | float):
+        if self.is_can_move:
+            now_position = self.get_position()
 
-        distance = self._speed * delta_time
-        now_position.x += distance
+            distance = self._speed * delta_time
+            now_position.x += distance
 
     def get_damage(self, entity, damage):
         if not self.is_invicible and self._health > 0 and entity is not None:
@@ -71,10 +90,10 @@ class MeleeUnit(ClickableObject):
 
         return pg.sprite.collide_rect(sprite, sprite_enemy)
 
-    def attack(self, entity: GameObject, damage):
+    def attack(self, entity: GameObject, damage_modificator: float | int):
         is_collision = self.collision(entity)
-        if is_collision:
-            health_remains = entity.get_damage(self, self._damage)
+        if self.is_can_attack and is_collision:
+            health_remains = entity.get_damage(self, self._damage * damage_modificator)
 
         return is_collision
 
@@ -104,10 +123,9 @@ class MeleeUnit(ClickableObject):
         return object_copy
 
     def _copy_protected_attrs(self, object_copy: object):
-        attrs = [
-            "_is_invicible",
-        ]
+        super()._copy_protected_attrs(object_copy)
+        attrs = ["_is_invicible"]
 
         for attribute in attrs:
             self_attr_value = getattr(self, attribute)
-            setattr(object_copy, self_attr_value)
+            setattr(object_copy, attribute, self_attr_value)
