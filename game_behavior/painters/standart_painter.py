@@ -4,6 +4,9 @@ from game_objects.abstract_objects import GameObject
 class StandartPainter:
     _objects: list[GameObject] = None
 
+    def __init__(self):
+        self._objects = []
+
     @property
     def objects(self):
         return tuple(self._objects)

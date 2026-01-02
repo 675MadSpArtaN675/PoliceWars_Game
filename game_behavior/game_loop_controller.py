@@ -1,6 +1,7 @@
 from .event_performer import EventPerformer, KeyEventPerformer
 from utility_classes.size import Size
 from .objects_data import GameLoopData
+from .unit_processor import UnitProcessor
 
 from typing import Callable
 
@@ -68,6 +69,14 @@ class GameLoopController:
             return
 
         raise TypeError("It is not a EventPerformer or it's subclass")
+
+    @property
+    def unit_processor(self):
+        return self._unit_processor
+
+    @unit_processor.setter
+    def unit_processor(self, processor: UnitProcessor):
+        self._unit_processor = processor
 
     def is_delete_mode_activated(self):
         return self._loop_state.delete_mode

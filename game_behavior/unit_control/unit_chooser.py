@@ -7,7 +7,7 @@ class UnitChooser:
     _buffer: MeleeUnit = None
     _chosen_unit_types: list[MeleeUnit] = ()
 
-    def __init__(self, chosen_units: list[type]):
+    def __init__(self, chosen_units: list[MeleeUnit]):
         self._chosen_unit_types = chosen_units
 
     @property

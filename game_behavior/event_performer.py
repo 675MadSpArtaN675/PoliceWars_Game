@@ -1,5 +1,9 @@
 from typing import Callable
+
 from enum import IntEnum, auto
+from dataclasses import dataclass
+
+
 import pygame as pg
 
 EventListenerFunction = Callable[[pg.event.Event], None]
@@ -31,11 +35,33 @@ class EventPerformer:
             self._events.pop(event_type)
 
 
+@dataclass
+class KeyEvent:
+    event_type: int
+    button: MouseButton
+
+    def to_tuple(self):
+        return (self.event_type, self.button)
+
+
 class KeyEventPerformer(EventPerformer):
     _is_only_mouse_event: bool = False
 
     def __init__(self, is_mouse_events: bool = False):
         self._is_only_mouse_event = is_mouse_events
+
+    def set_event(
+        self,
+        event_type_mouse_button: KeyEvent,
+        function_performer: EventListenerFunction,
+    ):
+        if self._is_only_mouse_event and event_type_mouse_button.event_type not in [
+            pg.MOUSEBUTTONDOWN,
+            pg.MOUSEBUTTONUP,
+        ]:
+            raise TypeError("No mouse event!")
+
+        self._events[event_type_mouse_button.to_tuple()] = function_performer
 
     def perform_event(
         self, event: pg.event.Event, event_type: int = pg.MOUSEBUTTONDOWN

@@ -124,7 +124,7 @@ class MeleeUnit(ClickableObject):
 
     def _copy_protected_attrs(self, object_copy: object):
         super()._copy_protected_attrs(object_copy)
-        attrs = ["_is_invicible"]
+        attrs = ["_is_invicible", "_is_can_attack", "_is_can_move"]
 
         for attribute in attrs:
             self_attr_value = getattr(self, attribute)
