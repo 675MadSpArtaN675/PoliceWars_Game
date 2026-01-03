@@ -1,11 +1,11 @@
-from ..abstract_objects import ClickableObject, GameObject
+from ..abstract_objects import ClickableObject, GameObject, CollideableObject
 from ..sprites_types import SimpleSprite
 
 from utility_classes.point import Point
 import pygame as pg
 
 
-class MeleeUnit(ClickableObject):
+class MeleeUnit(ClickableObject, CollideableObject):
     _type = "meleeunit"
     _display_name = "MeleeUnit"
 
@@ -69,7 +69,7 @@ class MeleeUnit(ClickableObject):
         return self._health
 
     def move(self, delta_time: int | float):
-        if self.is_can_move:
+        if self.is_can_move and not self.is_dead():
             now_position = self.get_position()
 
             distance = self._speed * delta_time
@@ -81,18 +81,9 @@ class MeleeUnit(ClickableObject):
 
         return self._health
 
-    def collision(self, entity: GameObject):
-        if type(entity) in self._restricted_objects:
-            return False
-
-        sprite = self.get_sprite()
-        sprite_enemy = entity.get_sprite()
-
-        return pg.sprite.collide_rect(sprite, sprite_enemy)
-
     def attack(self, entity: GameObject, damage_modificator: float | int):
         is_collision = self.collision(entity)
-        if self.is_can_attack and is_collision:
+        if self.is_can_attack and not self.is_dead() and is_collision:
             health_remains = entity.get_damage(self, self._damage * damage_modificator)
 
         return is_collision

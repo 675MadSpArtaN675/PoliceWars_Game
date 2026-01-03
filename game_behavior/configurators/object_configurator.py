@@ -6,7 +6,7 @@ from ..creators import (
     EnemyCreator,
 )
 
-from game_behavior import ActionPerformer
+from game_behavior import ActionPerformer, ObjectDeleter
 from game_behavior.painters import StandartPainter, ObjectPainter
 from game_behavior.unit_control import UnitChooser
 
@@ -31,6 +31,8 @@ class ObjectManager:
     _bullets_creator: BulletCreator = None
     _enemy_creator: EnemyCreator = None
     _ui_creator: Creator = None
+
+    _object_deleter: ObjectDeleter = None
 
     _ui_painter = StandartPainter()
     _object_painter = ObjectPainter()
@@ -60,6 +62,8 @@ class ObjectManager:
         self._enemy_creator = enemies_creator
         self._policemans_creator = policemans_creator
 
+        self._object_deleter = ObjectDeleter()
+
     @property
     def chooser(self):
         return self._chooser
@@ -82,27 +86,37 @@ class ObjectManager:
         self._ui_creator.create()
 
     def ConfigurePainters(self):
-        self._object_painter.objects = self._map_creator.get_objects()
-        self._enemy_painter.objects = self._enemy_creator.get_objects()
-        self._bullet_painter.objects = self._bullets_creator.get_objects()
-        self._ui_painter.objects = self._ui_creator.get_objects()
+        self._object_painter.add(*self._map_creator.get_objects())
+        self._enemy_painter.add(self._enemy_creator.get_objects())
+        self._bullet_painter.add(self._bullets_creator.get_objects())
+        self._ui_painter.add(self._ui_creator.get_objects())
 
     def ConfigureActionPerformers(self):
-        policemans = self._policemans_creator.get_objects()
-        map_objects = self._map_creator.get_objects()
+        policemans, working_units = self._policemans_creator.get_objects()
+        map_objects, clickable_map_objects = self._map_creator.get_objects()
         bullet_objects = self._bullets_creator.get_objects()
         enemies_objects = self._enemy_creator.get_objects()
         ui_objects = self._ui_creator.get_objects()
 
+        self._object_deleter.add(
+            policemans,
+            map_objects,
+            clickable_map_objects,
+            working_units,
+            bullet_objects,
+            enemies_objects,
+            ui_objects,
+        )
+
         self._object_action_performer.add(map_objects)
-        self._detectable_objects_action_performer.add(ui_objects)
+        self._detectable_objects_action_performer.add(ui_objects, clickable_map_objects)
         self._bullet_action_performer.add(bullet_objects)
-        self._click_object_action_performer.add(ui_objects, map_objects)
-        self._policemans_action_performer.add(policemans)
+        self._click_object_action_performer.add(ui_objects, clickable_map_objects)
+        self._policemans_action_performer.add(working_units)
         self._enemy_action_performer.add(enemies_objects)
 
-        self._object_action_performer.func_performer = (
-            lambda game_object: game_object.detect()
+        self._object_action_performer.func_performer = partial(
+            self._map_creator.process_object, enemies=enemies_objects
         )
         self._detectable_objects_action_performer.func_performer = (
             lambda game_object: game_object.detect()
@@ -115,24 +129,27 @@ class ObjectManager:
         if unit_processor is not None:
             self._unit_processor = unit_processor
 
-            policemans = self._policemans_creator.get_objects()
+            _, working_units = self._policemans_creator.get_objects()
             enemies_objects = self._enemy_creator.get_objects()
+            bullets = self._bullets_creator.get_objects()
 
             self._bullet_action_performer.func_performer = partial(
                 self._unit_processor.process,
-                objects_to_collide_list=[policemans, enemies_objects],
+                objects_to_collide_list=[working_units, enemies_objects],
             )
             self._enemy_action_performer.func_performer = partial(
-                self._unit_processor.process, objects_to_collide_list=[policemans]
+                self._unit_processor.process,
+                objects_to_collide_list=[working_units, bullets],
             )
 
             self._policemans_action_performer.func_performer = partial(
-                self._unit_processor.process, objects_to_collide_list=[enemies_objects]
+                self._unit_processor.process,
+                objects_to_collide_list=[enemies_objects, bullets],
             )
 
     def ConfigureChooser(self):
         if self._chooser is None:
-            self._chooser = UnitChooser(self._policemans_creator.get_objects())
+            self._chooser = UnitChooser(self._policemans_creator.get_objects()[0])
 
     def ConfigureEventListeners(self):
         self._listeners = EventListenersConfigurator(self._game_cycle)
@@ -143,20 +160,15 @@ class ObjectManager:
             object_click_event=self._click_object_action_performer.perform
         )
 
-    def Draw(self, surface: pg.Surface, delta_time):
+    def Draw(self, surface: pg.Surface, delta_time: int | float, is_paused: bool):
         surface.fill(pg.Color(0, 255, 0))
 
-        self._object_action_perform(delta_time)
+        if not is_paused:
+            self._object_action_perform(delta_time)
+
         self._paint_objects()
 
-        self._remove_dead_objects_from_performers()
-        self._remove_dead_objects_from_painters()
-
-    def _remove_dead_objects_from_painters(self):
-        self._object_painter.remove_dead_objects()
-        self._enemy_painter.remove_dead_objects()
-        self._bullet_painter.remove_dead_objects()
-        self._ui_painter.remove_dead_objects()
+        self._object_deleter.remove_dead_objects()
 
     def _paint_objects(self):
         self._object_painter.paint_background()
@@ -165,17 +177,9 @@ class ObjectManager:
         self._bullet_painter.paint()
         self._ui_painter.paint()
 
-    def _remove_dead_objects_from_performers(self):
-        self._detectable_objects_action_performer.remove_dead_objects()
-        self._enemy_action_performer.remove_dead_objects()
-        self._policemans_action_performer.remove_dead_objects()
-        self._object_action_performer.remove_dead_objects()
-        self._click_object_action_performer.remove_dead_objects()
-        self._bullet_action_performer.remove_dead_objects()
-
     def _object_action_perform(self, delta_time: int | float):
         self._detectable_objects_action_performer.perform()
-        self._object_action_performer.perform()
+        self._object_action_performer.perform(delta_time)
         self._enemy_action_performer.perform(delta_time)
         self._policemans_action_performer.perform(delta_time)
         self._bullet_action_performer.perform(delta_time)

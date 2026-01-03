@@ -11,6 +11,7 @@ class GameLoopData:
     clock: pg.time.Clock = None
 
     running: bool = True
+    paused: bool = False
     delete_mode: bool = False
 
     key_performer: KeyEventPerformer = None

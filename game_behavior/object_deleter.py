@@ -1,24 +1,11 @@
-from typing import Callable
 from game_objects.abstract_objects import GameObject
 
-ObjectPerformer = Callable[[GameObject], None]
 
-
-class ActionPerformer:
+class ObjectDeleter:
     _objects: list[list[GameObject]]
-
-    _func_performers: list[ObjectPerformer]
 
     def __init__(self):
         self._objects = []
-
-    @property
-    def performers(self):
-        return tuple(self._func_performers)
-
-    @performers.setter
-    def performers(self, *args: ObjectPerformer):
-        self._func_performers = list(args)
 
     @property
     def objects(self):
@@ -32,7 +19,8 @@ class ActionPerformer:
         for object_list in objects:
             self._objects.append(object_list)
 
-    def perform(self, *args):
+    def remove_dead_objects(self):
         for object_list in self._objects:
             for object_ in object_list:
-                self.func_performer(object_, *args)
+                if object_ is not None and object_ in object_list and object_.is_dead():
+                    object_list.remove(object_)

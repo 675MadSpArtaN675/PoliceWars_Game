@@ -23,7 +23,7 @@ class UnitProcessor:
         delta_time: int | float,
         objects_to_collide_list: list[list[MeleeUnit | GunnerUnit]],
     ):
-        if unit is not None:
+        if unit is not None and type(unit) not in (tuple, list):
             objects_to_collide_list = self._union_list(objects_to_collide_list)
 
             if unit.health <= 0:
@@ -56,7 +56,8 @@ class UnitProcessor:
         collide = False
         for object_to_collide in objects_to_collide_list:
             if (
-                not object_to_collide.is_dead()
+                object_to_collide is not None
+                and not object_to_collide.is_dead()
                 and object_to_collide.team != unit.team
                 and unit.collision(object_to_collide)
             ):
@@ -74,7 +75,7 @@ class UnitProcessor:
         for object_ in objects:
             result.extend(object_)
 
-        return result
+        return tuple(result)
 
     def police_place(self):
         unit = self._chooser.extract_unit()

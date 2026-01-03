@@ -51,5 +51,9 @@ class Cell(ClickableObject):
     def delete_unit(self):
         self._unit = None
 
+    def clear(self):
+        if self._unit.is_dead():
+            self.delete_unit()
+
     def get_unit(self):
         return self._unit

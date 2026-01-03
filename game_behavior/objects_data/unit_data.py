@@ -8,12 +8,12 @@ import pygame as pg
 
 
 class UnitType(IntEnum):
-    Melee: int = auto()
+    Melee: int = 0
     Gunner: int = auto()
 
 
 class UnitFraction(IntEnum):
-    Police: int = auto()
+    Police: int = 0
     Terrorists: int = auto()
 
 

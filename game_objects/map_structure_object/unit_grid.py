@@ -69,9 +69,19 @@ class UnitGrid(GameObject):
         for line in self._grid:
             line.render()
 
+    def clear(self):
+        for line in self._grid:
+            line.clear()
+
+    def get_positions_of_last_points(self):
+        return [
+            self._grid[line_num][self._column_count].get_position().copy()
+            for line_num in range(self._row_count)
+        ]
+
     def get_centers_of_last_points(self):
         return [
-            self._gird[line_num][self._column_count].center()
+            self._grid[line_num][self._column_count].center()
             for line_num in range(self._row_count)
         ]
 

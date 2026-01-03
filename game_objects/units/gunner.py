@@ -123,8 +123,7 @@ class GunnerUnit(MeleeUnit):
             bullet_pos = self._position.copy()
             bullet_pos += self._bullet_settings.bullet_spawn_position.copy()
 
-            self._time_to_shoot = 0
-            return self._bullet_settings.bullet_type(
+            bullet = self._bullet_settings.bullet_type(
                 self._screen_to_render,
                 self._bullet_settings.bullet_sprite.copy(),
                 100,
@@ -134,6 +133,9 @@ class GunnerUnit(MeleeUnit):
                 position=bullet_pos,
                 restricted_objects=[],
             )
+
+            self._time_to_shoot = 0
+            return bullet
 
         self._time_to_shoot += delta_time
         return None

@@ -16,12 +16,6 @@ class ObjectPainter(StandartPainter):
     def field_size(self, size: Size):
         self._policmans_field_size = size
 
-    def remove_dead_objects(self):
-        super().remove_dead_objects()
-
-        if self._background_objects is not None:
-            self._remove_dead_objects(self._background_objects)
-
     def paint_background(self):
         if (
             self._policmans_field_size is not None

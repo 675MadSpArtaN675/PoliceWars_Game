@@ -78,6 +78,15 @@ class GameLoopController:
     def unit_processor(self, processor: UnitProcessor):
         self._unit_processor = processor
 
+    def is_paused(self):
+        return self._loop_state.paused
+
+    def pause_game(self):
+        self._loop_state.paused = True
+
+    def resume_game(self):
+        self._loop_state.paused = False
+
     def is_delete_mode_activated(self):
         return self._loop_state.delete_mode
 
@@ -96,7 +105,9 @@ class GameLoopController:
             self._event_perform_cycle()
 
             if frame_paint_func is not None:
-                frame_paint_func(self._loop_state.screen, delta_time)
+                frame_paint_func(
+                    self._loop_state.screen, delta_time, self._loop_state.paused
+                )
 
             pg.display.flip()
             self._loop_state.clock.tick(60)

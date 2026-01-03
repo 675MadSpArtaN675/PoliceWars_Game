@@ -6,7 +6,6 @@ from game_objects.units import MeleeUnit, GunnerUnit, Bullet
 from game_behavior.objects_data import UnitFraction
 from game_behavior.configurators import (
     ObjectManager,
-    EventListenersConfigurator,
     UIConfigurator,
 )
 from game_behavior.creators import (
@@ -33,14 +32,6 @@ units_to_choose = [
         SimpleSprite(50, 50, pg.Color(0, 50, 0)),
         100,
         20,
-        10,
-        UnitFraction.Police,
-    ),
-    MeleeUnit(
-        game.screen,
-        SimpleSprite(50, 50, pg.Color(0, 125, 0)),
-        100,
-        35,
         10,
         UnitFraction.Police,
     ),
@@ -81,8 +72,8 @@ object_configurer.ConfigureActionPerformers()
 object_configurer.ConfigureUnitProcessor(
     UnitProcessor(
         object_configurer.chooser,
-        policeman_creator.get_objects(),
-        enemy_creator.get_objects(),
+        policeman_creator.get_objects()[1],
+        bullet_creator.get_objects(),
     )
 )
 object_configurer.ConfigureEventListeners()

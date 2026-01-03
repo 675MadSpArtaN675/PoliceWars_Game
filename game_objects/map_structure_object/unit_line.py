@@ -52,6 +52,10 @@ class UnitLine(GameObject):
         for cell in self._unit_cells:
             cell.render()
 
+    def clear(self):
+        for cell in self._unit_cells:
+            cell.clear()
+
     def build(self):
         if self._cell_count > 0:
             self._unit_cells = []
