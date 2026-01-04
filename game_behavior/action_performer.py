@@ -11,6 +11,7 @@ class ActionPerformer:
 
     def __init__(self):
         self._objects = []
+        self._func_performers = []
 
     @property
     def performers(self):
@@ -35,4 +36,5 @@ class ActionPerformer:
     def perform(self, *args):
         for object_list in self._objects:
             for object_ in object_list:
-                self.func_performer(object_, *args)
+                for func in self._func_performers:
+                    func(object_, *args)

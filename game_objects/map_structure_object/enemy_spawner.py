@@ -11,7 +11,7 @@ import pygame as pg
 import random
 
 
-class EnemySpawner(GameObject, ProcessableObject):
+class EnemySpawner(GameObject):
     _units: UnitList
     _is_spawn_blocked: bool = False
 
@@ -42,19 +42,6 @@ class EnemySpawner(GameObject, ProcessableObject):
 
     def get_spawn_block_flag(self):
         return self._is_spawn_blocked
-
-    def process(self, delta_time: int | float, **kwargs):
-        if not self._is_spawn_blocked and self._time >= self._interval:
-            enemies: list[MeleeUnit] = kwargs.get("enemies")
-
-            if enemies is not None:
-                spawned_enemies = self.spawn()
-                enemies.extend(spawned_enemies)
-
-            self._time = 0
-            return
-
-        self._time += delta_time
 
     def spawn(self, unit_count: int = 1):
         if unit_count > 0:

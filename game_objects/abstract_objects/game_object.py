@@ -11,7 +11,9 @@ import pygame as pg
 class GameObject:
     _type = "object"
     _display_name = "GameObject"
+
     _is_dead: bool = False
+    _is_renderable: bool = True
 
     _on_render: Callable = None
 
@@ -37,6 +39,14 @@ class GameObject:
         self._depth = depth
 
     @property
+    def is_renderable(self):
+        return self._is_renderable
+
+    @is_renderable.setter
+    def is_renderable(self, flag: bool):
+        self._is_renderable = flag
+
+    @property
     def type_name(self):
         return self._type
 
@@ -49,7 +59,7 @@ class GameObject:
         return self._sprite.rect.center
 
     def render(self):
-        if not self._is_dead:
+        if self.is_renderable and not self._is_dead:
             self._sprite.rect.x, self._sprite.rect.y = self._position.to_tuple()
 
             self._sprite.update()

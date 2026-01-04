@@ -29,5 +29,7 @@ class EventListenersConfigurator:
         self._game_cycle.mouse_key_event_listener = self.mouse_listener
 
         self.mouse_listener.set_event(
-            KeyEvent(pg.MOUSEBUTTONDOWN, MouseButton.Left), kwargs["object_click_event"]
+            KeyEvent(pg.MOUSEBUTTONDOWN, MouseButton.Left),
+            kwargs["object_click_event"],
+            kwargs["ui_click_event"],
         )

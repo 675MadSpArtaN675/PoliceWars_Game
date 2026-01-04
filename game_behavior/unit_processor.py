@@ -1,18 +1,28 @@
 from game_behavior.unit_control import UnitChooser
 from game_objects.units import MeleeUnit, GunnerUnit, Bullet
 
+from .game_loop_controller import GameLoopController
+
 import pygame as pg
 
 
 class UnitProcessor:
+    _game_cycle: GameLoopController
+
     _chooser: UnitChooser
 
     _policemans: list[MeleeUnit]
     _bullets: list[Bullet]
 
     def __init__(
-        self, chooser: UnitChooser, policemans: list[MeleeUnit], bullets: list[Bullet]
+        self,
+        game_cycle: GameLoopController,
+        chooser: UnitChooser,
+        policemans: list[MeleeUnit],
+        bullets: list[Bullet],
     ):
+        self._game_cycle = game_cycle
+
         self._chooser = chooser
         self._policemans = policemans
         self._bullets = bullets
@@ -78,7 +88,21 @@ class UnitProcessor:
         return tuple(result)
 
     def police_place(self):
-        unit = self._chooser.extract_unit()
-        self._policemans.append(unit)
+        if (
+            not self._game_cycle.is_paused()
+            and not self._game_cycle.is_delete_mode_activated()
+        ):
+            unit = self._chooser.extract_unit()
 
-        return unit
+            if unit is not None:
+                self._policemans.append(unit)
+
+                return unit, False
+
+        elif (
+            not self._game_cycle.is_paused()
+            and self._game_cycle.is_delete_mode_activated()
+        ):
+            return None, True
+
+        return None, False

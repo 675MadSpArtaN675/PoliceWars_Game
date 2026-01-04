@@ -1,13 +1,10 @@
-from game_behavior import GameLoopController, UnitProcessor
+from game_behavior import GameLoopController, UnitProcessor, ObjectManager
 
 from game_objects.sprites_types import SimpleSprite
 from game_objects.units import MeleeUnit, GunnerUnit, Bullet
 
-from game_behavior.objects_data import UnitFraction
-from game_behavior.configurators import (
-    ObjectManager,
-    UIConfigurator,
-)
+from game_behavior.objects_data import UnitFraction, UnitList, UnitToSpawn
+from game_behavior.configurators import UIConfigurator
 from game_behavior.creators import (
     EnemyCreator,
     BulletCreator,
@@ -25,6 +22,44 @@ import pygame as pg
 
 game = GameLoopController(Size(1024, 768))
 game.init_loop()
+
+enemy_units = UnitList(
+    [
+        UnitToSpawn(
+            MeleeUnit(
+                game.screen,
+                SimpleSprite(50, 50, pg.Color(255, 255, 255)),
+                100,
+                10,
+                -10,
+                UnitFraction.Terrorists,
+            ),
+            50,
+        ),
+        UnitToSpawn(
+            MeleeUnit(
+                game.screen,
+                SimpleSprite(50, 50, pg.Color(255, 255, 125)),
+                100,
+                15,
+                -5,
+                UnitFraction.Terrorists,
+            ),
+            10,
+        ),
+        UnitToSpawn(
+            MeleeUnit(
+                game.screen,
+                SimpleSprite(50, 50, pg.Color(255, 255, 125)),
+                125,
+                25,
+                -2,
+                UnitFraction.Terrorists,
+            ),
+            10,
+        ),
+    ]
+)
 
 units_to_choose = [
     MeleeUnit(
@@ -53,7 +88,7 @@ units_to_choose = [
 enemy_creator = EnemyCreator(game)
 policeman_creator = PolicemansCreator(game, units_to_choose)
 bullet_creator = BulletCreator(game)
-map_object_creator = MapObjectsCreator(game, Size(5, 10))
+map_object_creator = MapObjectsCreator(game, Size(5, 10), enemy_units)
 
 
 object_configurer = ObjectManager(
@@ -71,6 +106,7 @@ object_configurer.ConfigurePainters()
 object_configurer.ConfigureActionPerformers()
 object_configurer.ConfigureUnitProcessor(
     UnitProcessor(
+        game,
         object_configurer.chooser,
         policeman_creator.get_objects()[1],
         bullet_creator.get_objects(),

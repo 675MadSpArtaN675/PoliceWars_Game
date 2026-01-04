@@ -12,6 +12,7 @@ class GameLoopData:
 
     running: bool = True
     paused: bool = False
+    ended: bool = False
     delete_mode: bool = False
 
     key_performer: KeyEventPerformer = None

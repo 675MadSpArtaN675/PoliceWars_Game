@@ -1,14 +1,13 @@
 from .event_performer import EventPerformer, KeyEventPerformer
 from utility_classes.size import Size
 from .objects_data import GameLoopData
-from .unit_processor import UnitProcessor
 
 from typing import Callable
 
 import pygame as pg
 
 
-FramePerformer = Callable[[pg.Surface, int], None]
+FramePerformer = Callable[[pg.Surface, int, bool, bool], None]
 
 
 class GameLoopController:
@@ -70,22 +69,33 @@ class GameLoopController:
 
         raise TypeError("It is not a EventPerformer or it's subclass")
 
-    @property
-    def unit_processor(self):
-        return self._unit_processor
-
-    @unit_processor.setter
-    def unit_processor(self, processor: UnitProcessor):
-        self._unit_processor = processor
-
     def is_paused(self):
         return self._loop_state.paused
+
+    def pause_toggle(self):
+        if self.is_paused():
+            self.resume_game()
+        else:
+            self.pause_game()
 
     def pause_game(self):
         self._loop_state.paused = True
 
     def resume_game(self):
         self._loop_state.paused = False
+        self._loop_state.ended = False
+
+    def is_ended(self):
+        return self._loop_state.ended
+
+    def end_game(self):
+        self._loop_state.ended = True
+
+    def delete_mode_toggle(self):
+        if self.is_delete_mode_activated():
+            self.delete_mode_deactivate()
+        else:
+            self.delete_mode_activate()
 
     def is_delete_mode_activated(self):
         return self._loop_state.delete_mode
@@ -106,7 +116,10 @@ class GameLoopController:
 
             if frame_paint_func is not None:
                 frame_paint_func(
-                    self._loop_state.screen, delta_time, self._loop_state.paused
+                    self._loop_state.screen,
+                    delta_time,
+                    self._loop_state.paused,
+                    self._loop_state.ended,
                 )
 
             pg.display.flip()

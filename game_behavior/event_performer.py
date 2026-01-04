@@ -16,7 +16,7 @@ class MouseButton(IntEnum):
 
 
 class EventPerformer:
-    _events: dict[int | tuple, EventListenerFunction] = dict()
+    _events: dict[int | tuple, list[EventListenerFunction]] = dict()
 
     def __init__(self):
         self._events = dict()
@@ -24,15 +24,19 @@ class EventPerformer:
     def perform_event(self, event: pg.event.Event):
         event_performer = self._events.get(event.type)
 
-        if event_performer is not None:
-            event_performer(event)
+        if event_performer is not None and len(event_performer) > 0:
+            for performer in event_performer:
+                performer(event)
 
-    def set_event(self, event_type: int, function_performer: EventListenerFunction):
-        self._events[event_type] = function_performer
+    def set_event(self, event_type: int, *function_performer: EventListenerFunction):
+        if self._events.get(event_type) is None:
+            self._events[event_type] = []
+
+        self._events[event_type].extend(function_performer)
 
     def remove_event(self, event_type: int):
         if self._events.get(event_type) is not None:
-            self._events.pop(event_type)
+            self._events[event_type].clear()
 
 
 @dataclass
@@ -53,7 +57,7 @@ class KeyEventPerformer(EventPerformer):
     def set_event(
         self,
         event_type_mouse_button: KeyEvent,
-        function_performer: EventListenerFunction,
+        *function_performer: EventListenerFunction,
     ):
         if self._is_only_mouse_event and event_type_mouse_button.event_type not in [
             pg.MOUSEBUTTONDOWN,
@@ -61,7 +65,7 @@ class KeyEventPerformer(EventPerformer):
         ]:
             raise TypeError("No mouse event!")
 
-        self._events[event_type_mouse_button.to_tuple()] = function_performer
+        super().set_event(event_type_mouse_button.to_tuple(), *function_performer)
 
     def perform_event(
         self, event: pg.event.Event, event_type: int = pg.MOUSEBUTTONDOWN
@@ -74,14 +78,16 @@ class KeyEventPerformer(EventPerformer):
             ):
                 event_performer = self._events.get((event_type, event.button))
 
-                if event_performer is not None:
-                    event_performer(event)
+                if event_performer is not None and len(event_performer) > 0:
+                    for performer in event_performer:
+                        performer(event)
 
             elif event.key is not None:
                 event_performer = self._events.get(event.key)
 
-                if event_performer is not None:
-                    event_performer(event)
+                if event_performer is not None and len(event_performer) > 0:
+                    for performer in event_performer:
+                        performer(event)
 
         except AttributeError as ex:
             print(ex)

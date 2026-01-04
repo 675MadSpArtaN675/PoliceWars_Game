@@ -29,14 +29,18 @@ class BattleUICreator(Creator):
         self._dx_between_buttons = distance_between_unit_button
 
     def create(self) -> list[GameObject]:
-        exit_button = self._create_exit_button()
+        super().create()
+
+        exit_button = self._create_exit_button(Point(950, 15))
+        pause_button = self._create_pause_game_button(Point(875, 15))
+        delete_mode_button = self._create_delete_mode_game_button(Point(800, 15))
+
         self._create_unit_buttons(self._dx_between_buttons)
 
+        self._objects.append(pause_button)
         self._objects.append(exit_button)
+        self._objects.append(delete_mode_button)
 
-        return self._objects
-
-    def get_objects(self) -> list[GameObject]:
         return self._objects
 
     def _create_unit_buttons(self, _dx_between_buttons: int):
@@ -58,12 +62,28 @@ class BattleUICreator(Creator):
 
             self._objects.append(unit_button)
 
-    def _create_exit_button(self):
+    def _create_exit_button(self, position: Point):
         return self._create_button(
             SimpleSprite(50, 50, pg.Color(0, 0, 50)),
             SimpleSprite(50, 50),
-            Point(950, 15),
+            position,
             self._game_cycle.nice_quit,
+        )
+
+    def _create_pause_game_button(self, position: Point):
+        return self._create_button(
+            SimpleSprite(50, 50, pg.Color(0, 0, 50)),
+            SimpleSprite(50, 50),
+            position,
+            self._game_cycle.pause_toggle,
+        )
+
+    def _create_delete_mode_game_button(self, position: Point):
+        return self._create_button(
+            SimpleSprite(50, 50, pg.Color(0, 0, 50)),
+            SimpleSprite(50, 50),
+            position,
+            self._game_cycle.delete_mode_toggle,
         )
 
     def _create_button(

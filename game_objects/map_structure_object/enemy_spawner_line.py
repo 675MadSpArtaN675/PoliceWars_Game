@@ -6,6 +6,8 @@ from game_behavior.objects_data import UnitList
 
 from utility_classes.point import Point
 
+from typing import Callable
+
 import random as r
 
 import pygame as pg
@@ -18,6 +20,27 @@ class EnemySpawnerLine(GameObject):
     _spawn_interval: int
     _is_spawn_blocked: bool
     _line_len: int
+
+    @staticmethod
+    def units_partition_to_cells(
+        spawn_function: Callable[[int, int], list[GameObject]],
+        spawning_line_len: int,
+        count: int,
+        spawn_list: list[GameObject],
+    ):
+        result = []
+        max_count_to_spawn = count
+
+        if len(spawn_list) > 0:
+            while max_count_to_spawn > 0:
+                random_cage = r.randint(0, spawning_line_len - 1)
+                random_count = r.randint(1, max_count_to_spawn)
+
+                result.extend(spawn_function(random_cage, random_count))
+
+                max_count_to_spawn -= random_count
+
+        return result
 
     def __init__(
         self,
@@ -39,33 +62,35 @@ class EnemySpawnerLine(GameObject):
         self._spawn_interval = spawn_interval
         self._is_spawn_blocked = is_spawn_blocked
 
-    def init_line(self):
+    def render(self):
+        for cell in self._spawner_list:
+            cell.render()
+
+    def build(self):
         pos = self._position.copy()
         for index in range(self._line_len):
             spawner = EnemySpawner(
                 self._screen_to_render,
-                self._sprite,
+                self._sprite.copy(),
                 self._units,
-                position=pos,
+                position=pos.copy(),
                 spawn_interval=self._spawn_interval,
                 is_spawn_blocked=self._is_spawn_blocked,
                 depth=self._depth + index,
             )
+            spawner.is_renderable = self.is_renderable
+
+            pos.y += self._sprite.rect.height
 
             self._spawner_list.append(spawner)
 
-        return
-
     def spawn(self, count: int):
-        result = []
+        return EnemySpawnerLine.units_partition_to_cells(
+            self._spawn_unit, self._line_len, count, self._units
+        )
 
-        if len(self._spawner_list) > 0:
-            for _ in range(count):
-                spawner_num = r.randint(0, self._line_len)
-
-                result.append(self._spawner_list[spawner_num])
-
-        return result
+    def _spawn_unit(self, cage_number: int, count: int):
+        return self._spawner_list[cage_number].spawn(count)
 
     def __getitem__(self, key: int):
         if key > 0 and key <= self._line_len:

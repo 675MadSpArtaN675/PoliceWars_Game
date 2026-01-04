@@ -11,6 +11,7 @@ import pygame as pg
 
 class UnitLine(GameObject):
     _func_click_performer: Callable
+    _primary_cell_sprite: SimpleSprite
     _selection_sprite: SimpleSprite
 
     _cell_count: int = 0

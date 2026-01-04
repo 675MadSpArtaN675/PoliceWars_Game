@@ -40,19 +40,25 @@ class Cell(ClickableObject):
 
     def click(self):
         if self._once_enter and self._on_click is not None:
-            unit = self._on_click()
-            self.place_unit(unit)
+            unit, is_need_clear = self._on_click()
+
+            if unit is not None and not is_need_clear:
+                self.place_unit(unit)
+
+            elif is_need_clear:
+                self.delete_unit()
 
     def place_unit(self, unit: MeleeUnit):
-        if self._is_can_place and unit is not None and self._unit is None:
+        if self._is_can_place and self._unit is None:
             unit.set_position(self._position.copy())
             self._unit = unit
 
     def delete_unit(self):
+        self._unit.destroy()
         self._unit = None
 
     def clear(self):
-        if self._unit.is_dead():
+        if not self._unit.is_dead():
             self.delete_unit()
 
     def get_unit(self):

@@ -60,13 +60,20 @@ class ClickableObject(GameObject):
         return self._clicked
 
     def render(self):
-        if self._once_enter and not self._one_render:
-            self._sprite, self._secondary_sprite = self._secondary_sprite, self._sprite
-            self._one_render = True
+        if self._is_renderable:
+            if self._once_enter and not self._one_render:
+                self._sprite, self._secondary_sprite = (
+                    self._secondary_sprite,
+                    self._sprite,
+                )
+                self._one_render = True
 
-        elif not self._once_enter and self._one_render:
-            self._sprite, self._secondary_sprite = self._secondary_sprite, self._sprite
-            self._one_render = False
+            elif not self._once_enter and self._one_render:
+                self._sprite, self._secondary_sprite = (
+                    self._secondary_sprite,
+                    self._sprite,
+                )
+                self._one_render = False
 
         super().render()
 

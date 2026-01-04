@@ -7,6 +7,7 @@ from .action_performer import ActionPerformer
 from .texture_loader import TextureLoader
 
 from .object_deleter import ObjectDeleter
+from .object_manager import ObjectManager
 from .unit_processor import UnitProcessor
 
 from . import objects_data
@@ -23,6 +24,7 @@ __all__ = [
     "TextureLoader",
     "GameLoopController",
     "ObjectDeleter",
+    "ObjectManager",
     "MouseButton",
     "objects_data",
     "configurators",
