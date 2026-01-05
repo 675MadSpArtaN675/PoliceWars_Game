@@ -1,11 +1,19 @@
-from game_behavior import GameLoopController, UnitProcessor, ObjectManager
+from core.game_behavior import (
+    GameLoopController,
+    UnitProcessor,
+    ObjectManager,
+    TextureLoader,
+)
 
-from game_objects.sprites_types import SimpleSprite
-from game_objects.units import MeleeUnit, GunnerUnit, Bullet
+from core.sprites_types import SimpleSprite
 
-from game_behavior.objects_data import UnitFraction, UnitList, UnitToSpawn
-from game_behavior.configurators import UIConfigurator
-from game_behavior.creators import (
+from core.game_objects.units import MeleeUnit, GunnerUnit, Bullet
+from core.game_objects.map_structure_object.spawners_data import UnitList, UnitToSpawn
+
+from core.objects_data import UnitFraction
+
+from core.game_behavior.configurators import UIConfigurator
+from core.game_behavior.creators import (
     EnemyCreator,
     BulletCreator,
     PolicemansCreator,
@@ -22,6 +30,8 @@ import pygame as pg
 
 game = GameLoopController(Size(1024, 768))
 game.init_loop()
+texture_loader = TextureLoader("resourses")
+
 
 enemy_units = UnitList(
     [
@@ -79,9 +89,10 @@ units_to_choose = [
         10,
         100,
         Bullet,
-        10,
-        6,
+        11,
+        3,
         UnitFraction.Police,
+        show_detector=True,
     ),
 ]
 
