@@ -34,6 +34,8 @@ class MeleeUnit(ClickableObject, CollideableObject):
     _damage: int = 0
     _speed: int = 0
 
+    _team: int = 2
+
     _hit_interval: int | float = 0
     _hit_distance: int | float = 0
 
@@ -84,6 +86,9 @@ class MeleeUnit(ClickableObject, CollideableObject):
 
         self._off_melee_detector = off_detector
 
+        self.initialize()
+
+    def initialize(self):
         self._detector_configure()
         self.__configure_timer()
 
@@ -266,6 +271,7 @@ class MeleeUnit(ClickableObject, CollideableObject):
         object_copy._health = self._health
         object_copy._damage = self._damage
         object_copy._speed = self._speed
+        object_copy._team = self._team
         object_copy._hit_interval = self._hit_interval
         object_copy._hit_distance = self._hit_distance
         object_copy._melee_detector = self._copy_linked_objects(self._melee_detector)

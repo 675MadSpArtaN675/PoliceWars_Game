@@ -25,7 +25,7 @@ class Detector(GameObject):
     def __init__(
         self,
         screen: pg.Surface = None,
-        cell_size: Size = None,
+        cell_size: Size = Size(),
         distance: int | float = 0,
         position: Point = Point(),
         ignore_units: list[str] = (),

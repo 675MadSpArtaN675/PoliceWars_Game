@@ -1,6 +1,7 @@
 from ...game_objects.units import MeleeUnit
 
 from functools import partial
+from copy import deepcopy
 
 
 class UnitChooser:
@@ -25,7 +26,7 @@ class UnitChooser:
 
     def extract_unit(self):
         if self._buffer is not None:
-            unit_type = self._buffer.copy()
+            unit_type = deepcopy(self._buffer)
             self._buffer = None
 
             return unit_type

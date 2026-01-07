@@ -2,10 +2,7 @@ class Size:
     _width: int
     _height: int
 
-    def __init__(self, width: int = 5, height: int = 5):
-        if not isinstance(width, int) or not isinstance(height, int):
-            raise TypeError("Width and height must be integer")
-
+    def __init__(self, width: int | float = 5, height: int | float = 5):
         self.width = width
         self.height = height
 
