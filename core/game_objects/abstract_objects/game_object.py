@@ -136,7 +136,7 @@ class GameObject:
         object_copy._sprite = self._copy_linked_objects(self._sprite)
 
         self._fill_memo(memo, object_copy)
-        print(object_copy.__dict__, self.__dict__)
+
         return object_copy
 
     def _fill_memo(self, memo: dict[int, object], object_copy: object):

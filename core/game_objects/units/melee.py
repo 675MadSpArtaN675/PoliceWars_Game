@@ -217,7 +217,7 @@ class MeleeUnit(ClickableObject, CollideableObject):
 
             return detector.is_detect_any(entities)
 
-        return ()
+        return False
 
     def get_damage(self, entity: CollideableObject, damage: float | int):
         if not self.is_invulerable and self._health > 0 and entity is not None:
@@ -230,7 +230,7 @@ class MeleeUnit(ClickableObject, CollideableObject):
             raise TypeError(
                 f"Modificator must be a float not {type(damage_modificator)}"
             )
-
+        print(self.is_can_attack, self._is_attacking, not self.is_dead())
         if self.is_can_attack and self._is_attacking and not self.is_dead():
             damage = self._damage * damage_modificator
             health_remains = entity.get_damage(self, damage)
@@ -280,6 +280,8 @@ class MeleeUnit(ClickableObject, CollideableObject):
         object_copy._restricted_objects = self._copy_linked_objects(
             self._restricted_objects
         )
+
+        object_copy._off_melee_detector = self._off_melee_detector
 
         object_copy._events_timer = self._copy_linked_objects(self._events_timer)
 
