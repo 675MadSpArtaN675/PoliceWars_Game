@@ -8,18 +8,19 @@ import pygame as pg
 class GridLine(GameObject):
     _game_object: GameObject = None
 
-    _object_list: list[GameObject]
+    _object_list: list[GameObject] = None
     _cell_count: int = 0
 
     def __init__(
         self,
+        *,
         screen: pg.Surface,
         cell_count: int,
         game_object: GameObject,
         position: Point = Point(),
         depth: int = 0,
     ):
-        super().__init__(screen, None, position=position, depth=depth)
+        super().__init__(screen=screen, sprite=None, position=position, depth=depth)
 
         self._cell_count = cell_count
         self._object_list = []
@@ -75,3 +76,13 @@ class GridLine(GameObject):
                 pos += Point(game_object.get_sprite().rect.width, 0)
 
         self._object_list.extend(line_objects)
+
+    def __deepcopy__(self, memo: dict[int, object]):
+        object_copy = super().__deepcopy__(memo)
+
+        object_copy._game_object = self._game_object
+
+        object_copy._object_list = self._copy_linked_objects(self._object_list)
+        object_copy._cell_count = self._cell_count
+
+        return object_copy

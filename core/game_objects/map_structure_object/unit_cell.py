@@ -18,14 +18,20 @@ class Cell(ClickableObject):
 
     def __init__(
         self,
+        *,
         screen: pg.Surface,
         sprite: SimpleSprite,
         secondary_sprite: SimpleSprite,
-        /,
         position: Point = Point(),
         depth: int = 0,
     ):
-        super().__init__(screen, sprite, secondary_sprite, position, depth)
+        super().__init__(
+            screen=screen,
+            sprite=sprite,
+            secondary_sprite=secondary_sprite,
+            position=position,
+            depth=depth,
+        )
 
     def get_cell_size(self):
         w = self._sprite.rect.width
@@ -64,3 +70,11 @@ class Cell(ClickableObject):
 
     def get_unit(self):
         return self._unit
+
+    def __deepcopy__(self, memo: dict[int, ClickableObject]):
+        object_copy = super().__deepcopy__(memo)
+
+        object_copy._unit = self._copy_linked_objects(self._unit)
+        object_copy._is_can_place = self._is_can_place
+
+        return object_copy

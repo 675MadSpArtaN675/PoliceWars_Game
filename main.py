@@ -7,7 +7,7 @@ from core.game_behavior import (
 
 from core.sprites_types import SimpleSprite
 
-from core.game_objects.units import MeleeUnit, GunnerUnit, Bullet
+from core.game_objects.units import MeleeUnit, GunnerUnit, Bullet, BulletData
 from core.game_objects.map_structure_object.spawners_data import UnitList, UnitToSpawn
 
 from core.objects_data import UnitFraction
@@ -22,8 +22,7 @@ from core.game_behavior.creators import (
 )
 
 
-from utility_classes.size import Size
-
+from utility_classes import Size, Point
 
 import pygame as pg
 
@@ -37,62 +36,65 @@ enemy_units = UnitList(
     [
         UnitToSpawn(
             MeleeUnit(
-                game.screen,
-                SimpleSprite(50, 50, pg.Color(255, 255, 255)),
-                100,
-                10,
-                -10,
-                UnitFraction.Terrorists,
+                screen=game.screen,
+                sprite=SimpleSprite(50, 50, pg.Color(255, 255, 255)),
+                health=100,
+                damage=10,
+                speed=-10,
+                team=UnitFraction.Terrorists,
             ),
             50,
         ),
         UnitToSpawn(
             MeleeUnit(
-                game.screen,
-                SimpleSprite(50, 50, pg.Color(255, 255, 125)),
-                100,
-                15,
-                -5,
-                UnitFraction.Terrorists,
+                screen=game.screen,
+                sprite=SimpleSprite(50, 50, pg.Color(255, 255, 125)),
+                health=100,
+                damage=15,
+                speed=-5,
+                team=UnitFraction.Terrorists,
             ),
             10,
         ),
         UnitToSpawn(
             MeleeUnit(
-                game.screen,
-                SimpleSprite(50, 50, pg.Color(255, 255, 125)),
-                125,
-                25,
-                -2,
-                UnitFraction.Terrorists,
+                screen=game.screen,
+                sprite=SimpleSprite(50, 50, pg.Color(255, 255, 125)),
+                health=125,
+                damage=25,
+                speed=-4,
+                team=UnitFraction.Terrorists,
             ),
             10,
         ),
     ]
 )
 
+
 units_to_choose = [
     MeleeUnit(
-        game.screen,
-        SimpleSprite(50, 50, pg.Color(0, 50, 0)),
-        100,
-        20,
-        10,
-        UnitFraction.Police,
+        screen=game.screen,
+        sprite=SimpleSprite(50, 50, pg.Color(0, 50, 0)),
+        health=100,
+        damage=20,
+        speed=10,
+        team=UnitFraction.Police,
     ),
     GunnerUnit(
-        game.screen,
-        SimpleSprite(50, 50, pg.Color(0, 200, 0)),
-        SimpleSprite(25, 25, pg.Color(255, 255, 0)),
-        100,
-        0,
-        10,
-        100,
-        Bullet,
-        11,
-        3,
-        UnitFraction.Police,
-        show_detector=True,
+        screen=game.screen,
+        sprite=SimpleSprite(50, 50, pg.Color(0, 200, 0)),
+        health=100,
+        melee_damage=5,
+        bullet=Bullet(
+            screen=game.screen,
+            sprite=SimpleSprite(15, 15),
+            bullet_data=BulletData(100, 30, 100, Point(50, 15)),
+            team=UnitFraction.Police,
+        ),
+        speed=0,
+        shoot_distance=10,
+        shoot_interval=3,
+        team=UnitFraction.Police,
     ),
 ]
 

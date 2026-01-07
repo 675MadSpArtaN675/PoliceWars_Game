@@ -9,7 +9,6 @@ from .object_deleter import ObjectDeleter
 from .object_manager import ObjectManager
 from .unit_processor import UnitProcessor
 
-from . import event_cores
 from . import painters
 from . import configurators
 
@@ -27,5 +26,4 @@ __all__ = [
     "MouseButton",
     "configurators",
     "painters",
-    "event_cores",
 ]

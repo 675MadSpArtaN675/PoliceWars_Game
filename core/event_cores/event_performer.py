@@ -1,5 +1,7 @@
 from .data import EventListenerFunction
 
+from copy import deepcopy
+
 import pygame as pg
 
 
@@ -25,3 +27,9 @@ class EventPerformer:
     def remove_event(self, event_type: int):
         if self._events.get(event_type) is not None:
             self._events[event_type].clear()
+
+    def copy(self):
+        performer_copy = EventPerformer()
+        performer_copy._events = deepcopy(self._events)
+
+        return performer_copy

@@ -17,6 +17,7 @@ class Grid(GameObject):
 
     def __init__(
         self,
+        *,
         screen: pg.Surface,
         game_object: GameObject,
         rows: int,
@@ -24,7 +25,7 @@ class Grid(GameObject):
         position: Point = Point(),
         depth: int = 0,
     ):
-        super().__init__(screen, None, position=position, depth=depth)
+        super().__init__(screen=screen, sprite=None, position=position, depth=depth)
 
         self._row_count = rows
         self._column_count = columns
@@ -75,3 +76,15 @@ class Grid(GameObject):
 
     def _validate_key(self, key: int, len: int):
         return key >= 0 and key < len
+
+    def __deepcopy__(self, memo: dict[int, object]):
+        object_copy = super().__deepcopy__(memo)
+
+        object_copy._game_object = self._game_object
+
+        object_copy._row_count = self._row_count
+        object_copy._column_count = self._column_count
+
+        object_copy._grid = self._copy_linked_objects(self._grid)
+
+        return object_copy

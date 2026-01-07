@@ -15,6 +15,7 @@ class UnitType(IntEnum):
 class UnitFraction(IntEnum):
     Police: int = 0
     Terrorists: int = auto()
+    NoFraction: int = auto()
 
 
 @dataclass

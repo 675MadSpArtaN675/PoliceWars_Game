@@ -5,6 +5,7 @@ from ...game_objects.abstract_objects import GameObject
 
 class Creator:
     _game_cycle: GameLoopController = None
+
     _objects: list[GameObject] = None
     _start_objects: list[GameObject] = None
 

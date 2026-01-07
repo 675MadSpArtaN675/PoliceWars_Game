@@ -1,5 +1,5 @@
 from .game_loop_data import GameLoopData
-from .event_cores import EventPerformer, KeyEventPerformer
+from ..event_cores import EventPerformer, KeyEventPerformer
 
 from utility_classes.size import Size
 

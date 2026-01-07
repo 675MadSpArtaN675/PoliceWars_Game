@@ -1,8 +1,8 @@
 from .. import (
     GameLoopController,
 )
-from ..event_cores import EventPerformer, KeyEventPerformer
-from ..event_cores.data import MouseButton, KeyEvent
+from ...event_cores import EventPerformer, KeyEventPerformer
+from ...event_cores.data import MouseButton, KeyEvent
 
 import pygame as pg
 

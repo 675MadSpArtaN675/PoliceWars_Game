@@ -15,12 +15,12 @@ import pygame as pg
 
 
 class EnemySpawnerLine(GameObject):
-    _spawner_list: list[EnemySpawner]
-    _units: UnitList
+    _spawner_list: list[EnemySpawner] = None
+    _units: UnitList = None
 
-    _spawn_interval: int
-    _is_spawn_blocked: bool
-    _line_len: int
+    _spawn_interval: int = 5
+    _is_spawn_blocked: bool = False
+    _line_len: int = 0
 
     @staticmethod
     def units_partition_to_cells(
@@ -45,17 +45,17 @@ class EnemySpawnerLine(GameObject):
 
     def __init__(
         self,
+        *,
         screen: pg.Surface,
         sprite: SimpleSprite,
         line_len: int,
         units: UnitList,
         spawn_interval: int,
         is_spawn_blocked: bool,
-        /,
         position: Point = Point(),
         depth: int = 0,
     ):
-        super().__init__(screen, sprite, position=position, depth=depth)
+        super().__init__(screen=screen, sprite=sprite, position=position, depth=depth)
         self._spawner_list = []
         self._line_len = line_len
         self._units = units
@@ -71,9 +71,9 @@ class EnemySpawnerLine(GameObject):
         pos = self._position.copy()
         for index in range(self._line_len):
             spawner = EnemySpawner(
-                self._screen_to_render,
-                self._sprite.copy(),
-                self._units,
+                screen=self._screen_to_render,
+                sprite=self._sprite.copy(),
+                units=self._units,
                 position=pos.copy(),
                 spawn_interval=self._spawn_interval,
                 is_spawn_blocked=self._is_spawn_blocked,
@@ -96,3 +96,16 @@ class EnemySpawnerLine(GameObject):
     def __getitem__(self, key: int):
         if key > 0 and key <= self._line_len:
             return self._spawner_list[key - 1]
+
+    def __deepcopy__(self, memo: dict[int, GameObject]):
+        object_copy = super().__deepcopy__(memo)
+
+        object_copy._spawner_list = self._copy_linked_objects(self._spawner_list)
+        object_copy._units = self._units
+
+        object_copy._spawn_interval = self._spawn_interval
+        object_copy._is_spawn_blocked = self._is_spawn_blocked
+
+        object_copy._line_len = self._line_len
+
+        return object_copy

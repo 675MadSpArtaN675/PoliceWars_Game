@@ -16,18 +16,19 @@ import random as r
 
 
 class EnemySpawnerGrid(GameObject, ProcessableObject):
-    _spawner_list: list[EnemySpawnerLine]
-    _units: UnitList
+    _spawner_list: list[EnemySpawnerLine] = None
+    _units: UnitList = None
 
-    _spawn_interval: int
+    _spawn_interval: int = 0
 
-    _line_count: int
-    _line_len: int
+    _line_count: int = 0
+    _line_len: int = 0
 
-    _is_spawn_blocked: bool
+    _is_spawn_blocked: bool = False
 
     def __init__(
         self,
+        *,
         screen: pg.Surface,
         sprite: SimpleSprite,
         line_len: int,
@@ -35,11 +36,10 @@ class EnemySpawnerGrid(GameObject, ProcessableObject):
         units: UnitList,
         spawn_interval: int,
         is_spawn_blocked: bool,
-        /,
         position: Point = Point(),
         depth: int = 0,
     ):
-        super().__init__(screen, sprite, position=position, depth=depth)
+        super().__init__(screen=screen, sprite=sprite, position=position, depth=depth)
 
         self._spawner_list = []
 
@@ -73,12 +73,12 @@ class EnemySpawnerGrid(GameObject, ProcessableObject):
 
         for index in range(self._line_count):
             spawner = EnemySpawnerLine(
-                self._screen_to_render,
-                self._sprite.copy(),
-                self._line_len,
-                self._units,
-                self._spawn_interval,
-                self._is_spawn_blocked,
+                screen=self._screen_to_render,
+                sprite=self._sprite.copy(),
+                line_len=self._line_len,
+                units=self._units,
+                spawn_interval=self._spawn_interval,
+                is_spawn_blocked=self._is_spawn_blocked,
                 position=pos.copy(),
                 depth=self._depth + index,
             )
@@ -113,3 +113,19 @@ class EnemySpawnerGrid(GameObject, ProcessableObject):
                     return line[second_key]
 
         raise IndexError("Incorrect index")
+
+    def __deepcopy__(self, memo: dict[int, GameObject]):
+        object_copy = super().__deepcopy__(memo)
+
+        object_copy._spawner_list = self._spawner_list.copy()
+        object_copy._units = self._units
+
+        object_copy._spawn_interval = self._spawn_interval
+        object_copy._is_spawn_blocked = self._is_spawn_blocked
+
+        object_copy._line_len = self._line_len
+        object_copy._line_count = self._line_count
+
+        self._copy(object_copy, self._interval)
+
+        return object_copy

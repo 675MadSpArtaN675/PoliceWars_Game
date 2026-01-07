@@ -9,13 +9,17 @@ class PoliceDeadZone(CollideableObject, ProcessableObject):
 
     def __init__(
         self,
-        game_cycle,
-        sprite: SimpleSprite,
-        /,
+        *,
+        game_cycle=None,
+        sprite: SimpleSprite = None,
         position: Point = Point(),
         depth: int = 0,
     ):
-        super().__init__(game_cycle.screen, sprite, position=position, depth=depth)
+        screen = None
+        if game_cycle is not None:
+            screen = game_cycle.screen
+
+        super().__init__(screen=screen, sprite=sprite, position=position, depth=depth)
 
         self._game_cycle = game_cycle
 
@@ -30,3 +34,10 @@ class PoliceDeadZone(CollideableObject, ProcessableObject):
                 if self.collision(enemy):
                     self.end_game()
                     break
+
+    def __deepcopy__(self, memo: dict[int, CollideableObject]):
+        object_copy = super().__deepcopy__(memo)
+
+        object_copy._game_cycle = self._game_cycle
+
+        return object_copy

@@ -34,6 +34,14 @@ class Size:
     def to_tuple(self):
         return (self._width, self._height)
 
+    def __deepcopy__(self, memo: dict[int, object]):
+        size_copy = type(self)(self.width, self.height)
+
+        memo[id(self)] = self
+        memo[id(size_copy)] = size_copy
+
+        return size_copy
+
     def __bool__(self):
         return self.width > 0 and self.height > 0
 

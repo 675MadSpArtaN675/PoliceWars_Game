@@ -1,39 +1,56 @@
-from .gunner import MeleeUnit
-
 from ...sprites_types import SimpleSprite
 from ..abstract_objects import GameObject
 
 from utility_classes.size import Size
 from utility_classes.point import Point
 
+from typing import Callable
+
+from copy import deepcopy
+
 import pygame as pg
+
+Predicate = Callable[[GameObject], bool]
 
 
 class Detector(GameObject):
-    _detected_entities: list[MeleeUnit]
+    _detected_entities: list[GameObject] = None
 
-    _cell_size: Size
-    _detection_distance: int | float
-    _ignore_units: list[str]
+    _cell_size: Size = None
+    _detection_distance: int | float = None
+    _ignore_units: list[str] = None
+
+    _filters: list[Predicate] = None
 
     def __init__(
         self,
-        screen: pg.Surface,
-        cell_size: Size,
-        distance: int | float,
+        screen: pg.Surface = None,
+        cell_size: Size = None,
+        distance: int | float = 0,
         position: Point = Point(),
         ignore_units: list[str] = (),
+        depth: int = 0,
     ):
-        super().__init__(screen, None, position, 0)
+        super().__init__(screen=screen, sprite=None, position=position, depth=depth)
 
         cell_size.height *= 0.8
         self._cell_size = cell_size
         self._detection_distance = distance
         self._ignore_units = ignore_units
+        self._filters = []
+        self._detected_entities = ()
 
     @property
     def can_work(self):
         return self._sprite is not None
+
+    def add_filter(self, function: Predicate):
+        if function is not None:
+            self._filters.append(function)
+
+    def remove_filter(self, function: Predicate):
+        if function is not None:
+            self._filters.remove(function)
 
     def refresh(self):
         self._sprite = SimpleSprite(
@@ -50,46 +67,56 @@ class Detector(GameObject):
     def set_distance(self, value: float | int):
         self._detection_distance = value
 
-    def detect_any(self, entities: list[MeleeUnit]):
+    def detect_any(self, entities: list[GameObject]):
         if self._sprite is not None:
-            filtered_entities = filter(
-                lambda x: issubclass(type(x), MeleeUnit),
-                entities,
-            )
+            filtered_entities = self._filter_entities(entities)
 
-            ents = tuple(map(lambda x: x.get_sprite().rect, filtered_entities))
+            if len(filtered_entities) > 0:
+                ents = tuple(map(lambda x: x.get_sprite().rect, filtered_entities))
 
-            collided_entities = self._sprite.rect.collideobjects(ents)
+                collided_entities = self._sprite.rect.collideobjects(ents)
 
-            if collided_entities is not None and len(collided_entities) > 0:
-                self._detected_entities = collided_entities
-                return collided_entities
+                if collided_entities is not None and len(collided_entities) > 0:
+                    self._detected_entities = collided_entities
+                    return collided_entities
 
         return ()
 
-    def detect(self, entity: MeleeUnit):
+    def detect(self, entity: GameObject):
         return self.detect_any([entity])
 
-    def is_detect_any(self, entities: list[MeleeUnit]):
+    def is_detect_any(self, entities: list[GameObject]):
         return len(self.detect_any(entities)) > 0
 
-    def is_detect(self, entity: MeleeUnit):
+    def is_detect(self, entity: GameObject):
         return len(self.is_detect_any([entity])) > 0
 
+    def is_empty(self):
+        return len(self._detected_entities) <= 0
+
     def clear_buffer(self):
-        if self._detected_entities != () and self._detected_entities != []:
-            self._detected_entities = ()
+        if len(self._detected_entities) > 0:
+            self._detected_entities.clear()
 
-    def copy(self):
-        object_copy = Detector(
-            self._screen_to_render,
-            self._cell_size.copy(),
-            self._detection_distance,
-            position=self._position.copy(),
-            ignore_units=self._ignore_units,
-        )
+    def _filter_entities(self, entities: list[GameObject]):
+        result = list(entities).copy()
+        for entity in result:
+            answers = all([filter_func(entity) for filter_func in self._filters])
 
-        self._copy_protected_attrs(object_copy)
+            if answers:
+                result.remove(entity)
 
-    def _copy_protected_attrs(self, object_copy: GameObject):
-        super()._copy_protected_attrs(object_copy)
+        return result
+
+    def __deepcopy__(self, memo: dict[int, GameObject]):
+        object_copy = super().__deepcopy__(memo)
+
+        object_copy._detected_entities = []
+
+        object_copy._cell_size = deepcopy(self._cell_size)
+        object_copy._detection_distance = self._detection_distance
+
+        object_copy._ignore_units = self._ignore_units
+        object_copy._filters = self._filters
+
+        return object_copy

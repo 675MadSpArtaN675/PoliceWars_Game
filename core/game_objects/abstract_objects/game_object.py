@@ -5,6 +5,8 @@ from ...sprites_types import SimpleSprite
 
 from typing import Callable
 
+import copy as c
+
 import pygame as pg
 
 
@@ -17,17 +19,17 @@ class GameObject:
 
     _on_render: Callable = None
 
-    _screen_to_render: pg.Surface
-    _sprite: SimpleSprite
+    _screen_to_render: pg.Surface = None
+    _sprite: SimpleSprite = None
 
-    _position: Point
+    _position: Point = None
     _depth: int = 0
 
     def __init__(
         self,
-        screen: pg.Surface,
-        sprite: SimpleSprite,
-        /,
+        *,
+        screen: pg.Surface = None,
+        sprite: SimpleSprite = None,
         position: Point = Point(),
         depth: int = 0,
     ):
@@ -120,20 +122,30 @@ class GameObject:
         self._depth = value
 
     def copy(self):
-        object_copy = GameObject(
-            self._screen_to_render,
-            self._sprite.copy(),
-            position=self._position.copy(),
+        return c.deepcopy(self)
+
+    def __repr__(self):
+        return f"[{self._type}]: {self._sprite} (id: {id(self._sprite)}), {self._position}, {self._depth}."
+
+    def __deepcopy__(self, memo: dict[int, object]):
+        object_copy = type(self)(
+            screen=self._screen_to_render,
+            position=self._copy_linked_objects(self._position),
             depth=self._depth,
         )
+        object_copy._sprite = self._copy_linked_objects(self._sprite)
 
-        self._copy_protected_attrs(object_copy)
+        self._fill_memo(memo, object_copy)
 
         return object_copy
 
-    def _copy_protected_attrs(self, object_copy: object):
-        attrs = ["_on_render", "_is_dead"]
+    def _fill_memo(self, memo: dict[int, object], object_copy: object):
+        memo[id(self)] = self
+        memo[id(object_copy)] = object_copy
 
-        for attribute in attrs:
-            self_attr_value = getattr(self, attribute)
-            setattr(object_copy, attribute, self_attr_value)
+    def _copy_linked_objects(self, object: object):
+        if object is not None:
+            try:
+                return object.copy()
+            except AttributeError:
+                return object

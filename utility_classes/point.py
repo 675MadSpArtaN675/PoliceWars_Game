@@ -35,5 +35,13 @@ class Point:
     def copy(self):
         return Point(self.x, self.y)
 
+    def __deepcopy__(self, memo: dict[int, object]):
+        point_copy = type(self)(self.x, self.y)
+
+        memo[id(self)] = self
+        memo[id(point_copy)] = point_copy
+
+        return point_copy
+
     def __repr__(self):
         return f"({self.x}; {self.y})"

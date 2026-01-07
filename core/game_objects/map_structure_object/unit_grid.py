@@ -6,6 +6,7 @@ from .unit_line import UnitLine
 from utility_classes.point import Point
 
 from typing import Callable
+
 import pygame as pg
 
 
@@ -20,13 +21,14 @@ class UnitGrid(GameObject):
 
     def __init__(
         self,
+        *,
         screen: pg.Surface,
         rows: int,
         columns: int,
         position: Point = Point(),
         depth: int = 0,
     ):
-        super().__init__(screen, None, position=position, depth=depth)
+        super().__init__(screen=screen, sprite=None, position=position, depth=depth)
 
         self._row_count = rows
         self._column_count = columns
@@ -130,16 +132,29 @@ class UnitGrid(GameObject):
             pos = self._position.copy()
             height = self._sprite.rect.height
 
-            for _ in range(self._row_count):
+            for index in range(self._row_count):
                 line = UnitLine(
-                    self._screen_to_render,
-                    self._sprite.copy(),
-                    self._selected_sprite.copy(),
-                    self._column_count,
+                    screen=self._screen_to_render,
+                    primary_cell_sprite=self._sprite.copy(),
+                    selection_sprite=self._selected_sprite.copy(),
+                    cell_count=self._column_count,
                     position=pos + Point(0, height),
-                    depth=self._depth - 1,
+                    depth=self._depth - index,
                 )
                 line.on_click_bind(self._func_click_performer)
                 line.build()
 
                 self._grid.append(line)
+
+    def __deepcopy__(self, memo: dict[int, GameObject]):
+        object_copy = super().__deepcopy__(memo)
+
+        object_copy._func_click_performer = self._func_click_performer
+        object_copy._selected_sprite = self._copy_linked_objects(self._selected_sprite)
+
+        object_copy._row_count = self._row_count
+        object_copy._column_count = self._column_count
+
+        object_copy._grid = self._copy_linked_objects(self._grid)
+
+        return object_copy

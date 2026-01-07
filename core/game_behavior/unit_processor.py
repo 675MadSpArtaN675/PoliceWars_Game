@@ -33,46 +33,55 @@ class UnitProcessor:
         objects_to_collide_list: list[list[MeleeUnit | GunnerUnit]],
     ):
         if unit is not None and type(unit) not in (tuple, list):
+            unit.event_timer_tick(delta_time)
+
             objects_to_collide_list = self._union_list(objects_to_collide_list)
 
-            if unit.health <= 0 and not unit.is_invulerable:
-                unit.destroy()
+            if unit.health <= 0.0 and not unit.is_invulerable:
+                unit.killself()
 
             collide = self._collide_with_accessed_objects(unit, objects_to_collide_list)
 
             if not collide and unit.is_can_move:
                 unit.move(delta_time)
 
-            self._gunner_shoot(unit, delta_time, objects_to_collide_list, collide)
+            self._gunner_shoot(unit, objects_to_collide_list, collide)
 
-    def _gunner_shoot(self, unit, delta_time, objects_to_collide_list, collide):
+    def _gunner_shoot(
+        self,
+        unit: MeleeUnit | GunnerUnit,
+        objects_to_collide_list: list[MeleeUnit | GunnerUnit],
+        collide: bool,
+    ):
         if issubclass(type(unit), GunnerUnit):
             if (
-                unit.is_can_attack
-                and not collide
-                and unit.is_detect(objects_to_collide_list)
+                not collide
+                and not unit.is_detect_melee(objects_to_collide_list)
+                and unit.is_detect_far(objects_to_collide_list)
             ):
-                shoot_bullet = unit.shoot(1.0, delta_time)
+                shoot_bullet = unit.shoot(1.0)
 
                 if shoot_bullet is not None:
                     self._bullets.append(shoot_bullet)
 
-    def _collide_with_accessed_objects(self, unit, objects_to_collide_list):
+    def _collide_with_accessed_objects(
+        self, unit: MeleeUnit, objects_to_collide_list: list[MeleeUnit]
+    ):
         collide = False
         for object_to_collide in objects_to_collide_list:
+            is_objects_collide = unit.collision(object_to_collide)
             if (
                 object_to_collide is not None
                 and not object_to_collide.is_dead()
                 and object_to_collide.team != unit.team
-                and unit.collision(object_to_collide)
+                and is_objects_collide
             ):
-                unit.attack(object_to_collide, 1.0)
-
-                if object_to_collide.health < 1:
-                    object_to_collide.destroy()
+                if is_objects_collide or unit.is_detect_melee(objects_to_collide_list):
+                    unit.attack(object_to_collide, 1.0)
 
                 collide = True
                 break
+
         return collide
 
     def _union_list(self, objects: list[list[MeleeUnit]]):

@@ -26,24 +26,27 @@ class KeyEventPerformer(EventPerformer):
     def perform_event(
         self, event: pg.event.Event, event_type: int = pg.MOUSEBUTTONDOWN
     ):
-        try:
-            if (
-                self._is_only_mouse_event
-                and event.type == event_type
-                and event.button is not None
-            ):
-                event_performer = self._events.get((event_type, event.button))
+        if (
+            self._is_only_mouse_event
+            and event.type == event_type
+            and event.button is not None
+        ):
+            event_performer = self._events.get((event_type, event.button))
 
-                if event_performer is not None and len(event_performer) > 0:
-                    for performer in event_performer:
-                        performer(event)
+            if event_performer is not None and len(event_performer) > 0:
+                for performer in event_performer:
+                    performer(event)
 
-            elif event.key is not None:
-                event_performer = self._events.get(event.key)
+        elif event.key is not None:
+            event_performer = self._events.get(event.key)
 
-                if event_performer is not None and len(event_performer) > 0:
-                    for performer in event_performer:
-                        performer(event)
+            if event_performer is not None and len(event_performer) > 0:
+                for performer in event_performer:
+                    performer(event)
 
-        except AttributeError as ex:
-            print(ex)
+    def copy(self):
+        object_copy = super().copy()
+
+        object_copy._is_only_mouse_event = self._is_only_mouse_event
+
+        return object_copy

@@ -96,9 +96,9 @@ class MapObjectsCreator(Creator):
         position: Point,
     ):
         unit_grid = UnitGrid(
-            self._game_cycle.screen,
-            self._grid_size.width,
-            self._grid_size.height,
+            screen=self._game_cycle.screen,
+            rows=self._grid_size.width,
+            columns=self._grid_size.height,
             position=position,
             depth=-100,
         )
@@ -115,7 +115,9 @@ class MapObjectsCreator(Creator):
 
     def _create_dead_zone(self, position: Point, need_render: bool):
         dead_zone = PoliceDeadZone(
-            self._game_cycle, SimpleSprite(50 * 4, 50 * 6), position=position
+            game_cycle=self._game_cycle,
+            sprite=SimpleSprite(50 * 4, 50 * 6),
+            position=position,
         )
 
         dead_zone.is_renderable = need_render
@@ -130,13 +132,13 @@ class MapObjectsCreator(Creator):
         need_render: bool,
     ):
         spawn_grid = EnemySpawnerGrid(
-            self._game_cycle.screen,
-            SimpleSprite(50, 50, pg.Color(255, 120, 0)),
-            size.height,
-            size.width,
-            self._enemies,
-            spawn_interval,
-            False,
+            screen=self._game_cycle.screen,
+            sprite=SimpleSprite(50, 50, pg.Color(255, 120, 0)),
+            line_len=size.height,
+            line_count=size.width,
+            units=self._enemies,
+            spawn_interval=spawn_interval,
+            is_spawn_blocked=False,
             position=position,
         )
 

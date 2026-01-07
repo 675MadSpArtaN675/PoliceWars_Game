@@ -5,8 +5,8 @@ import itertools as it
 
 
 class AnimatedSprite(SimpleSprite):
-    _frame_number: int
-    _images: list[pg.Surface]
+    _frame_number: int = 0
+    _images: list[pg.Surface] = ()
 
     def __init__(self, width: int, height: int, images: list[pg.Surface]):
         super().__init__(width, height)

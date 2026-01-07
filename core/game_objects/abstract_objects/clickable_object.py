@@ -25,19 +25,15 @@ class ClickableObject(GameObject):
 
     def __init__(
         self,
-        screen: pg.Surface,
-        sprite: SimpleSprite,
-        secondary_sprite: SimpleSprite,
-        /,
+        *,
+        screen: pg.Surface = None,
+        sprite: SimpleSprite = None,
+        secondary_sprite: SimpleSprite = None,
         position: Point = Point(),
         depth: int = 0,
     ):
-        super().__init__(screen, sprite, position=position, depth=depth)
-
-        if secondary_sprite is not None:
-            self._secondary_sprite = secondary_sprite
-        else:
-            self._secondary_sprite = self._sprite
+        super().__init__(screen=screen, sprite=sprite, position=position, depth=depth)
+        self._secondary_sprite = secondary_sprite
 
     def on_click_bind(self, function: Callable):
         self._on_click = function
@@ -106,32 +102,15 @@ class ClickableObject(GameObject):
 
         self._cursor_on_object = is_cursor_x_in_zone and is_cursor_y_in_zone
 
-    def copy(self):
-        object_copy = ClickableObject(
-            self._screen_to_render,
-            self._sprite.copy(),
-            self._secondary_sprite.copy(),
-            position=self._position.copy(),
-            depth=self._depth,
+    def __deepcopy__(self, memo: dict[int, object]):
+        object_copy = super().__deepcopy__(memo)
+
+        object_copy._secondary_sprite = self._copy_linked_objects(
+            self._secondary_sprite
         )
 
-        self._copy_protected_attrs(object_copy)
+        object_copy._on_click = self._on_click
+        object_copy._on_enter = self._on_enter
+        object_copy._on_exit = self._on_exit
 
         return object_copy
-
-    def _copy_protected_attrs(self, object_copy: object):
-        super()._copy_protected_attrs(object_copy)
-
-        attrs = [
-            "_cursor_on_object",
-            "_once_enter",
-            "_one_render",
-            "_clicked",
-            "_on_click",
-            "_on_enter",
-            "_on_exit",
-        ]
-
-        for attribute in attrs:
-            self_attr_value = getattr(self, attribute)
-            setattr(object_copy, attribute, self_attr_value)

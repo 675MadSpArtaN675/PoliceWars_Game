@@ -1,4 +1,4 @@
-from .event_cores import EventPerformer, KeyEventPerformer
+from ..event_cores import EventPerformer, KeyEventPerformer
 
 from utility_classes.size import Size
 

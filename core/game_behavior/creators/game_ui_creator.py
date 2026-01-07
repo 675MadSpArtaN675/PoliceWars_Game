@@ -96,10 +96,10 @@ class BattleUICreator(Creator):
         on_clicked_button,
     ):
         button = ClickableObject(
-            self._game_cycle.screen,
-            primary_sprite,
-            secondary_sprite,
-            position,
+            screen=self._game_cycle.screen,
+            sprite=primary_sprite,
+            secondary_sprite=secondary_sprite,
+            position=position,
         )
         button.on_click_bind(on_clicked_button)
 

@@ -8,10 +8,10 @@ import pathlib as pl
 class SimpleSprite(pg.sprite.Sprite):
     __image_path: str = None
     __resourse_image: str = None
-    _color: pg.Color
+    _color: pg.Color = None
 
-    _image: pg.Surface
-    _rect: pg.Rect
+    _image: pg.Surface = None
+    _rect: pg.Rect = None
 
     def __init__(
         self,
@@ -57,7 +57,13 @@ class SimpleSprite(pg.sprite.Sprite):
         width = self._rect.width
         height = self._rect.height
 
-        return SimpleSprite(width, height, self._color, self.__image_path)
+        sprite_copy = SimpleSprite(width, height)
+
+        sprite_copy._image = self._image.copy()
+        sprite_copy._rect = self._image.get_rect()
+        sprite_copy._color = pg.Color(self._color.r, self._color.g, self._color.b)
+
+        return sprite_copy
 
 
 def load_sprite(path_to_image: str, size: Size):

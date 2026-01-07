@@ -13,21 +13,21 @@ import random
 
 
 class EnemySpawner(GameObject):
-    _units: UnitList
+    _units: UnitList = None
     _is_spawn_blocked: bool = False
 
     def __init__(
         self,
+        *,
         screen: pg.Surface,
         sprite: SimpleSprite,
         units: UnitList,
-        /,
         position: Point = Point(),
         spawn_interval: int = 5,
         is_spawn_blocked: bool = False,
         depth: int = 0,
     ):
-        super().__init__(screen, sprite, position=position, depth=depth)
+        super().__init__(screen=screen, sprite=sprite, position=position, depth=depth)
 
         self._interval = spawn_interval
         self._is_spawn_blocked = is_spawn_blocked
@@ -57,3 +57,11 @@ class EnemySpawner(GameObject):
 
     def _get_random_unit(self, count: int):
         return random.choices(self._units, self._units.weights, k=count)
+
+    def __deepcopy__(self, memo: dict[int, GameObject]):
+        object_copy = super().__deepcopy__(memo)
+
+        object_copy._units = self._units
+        object_copy._is_spawn_blocked = self._is_spawn_blocked
+
+        return object_copy
