@@ -5,6 +5,8 @@ from .enemy_creator import EnemyCreator
 from .policemans_creator import PolicemansCreator
 
 from .map_objects_creator import MapObjectsCreator
+
+from .ui_creator import UICreator
 from .game_ui_creator import BattleUICreator
 
 __all__ = [
@@ -13,5 +15,6 @@ __all__ = [
     "EnemyCreator",
     "PolicemansCreator",
     "MapObjectsCreator",
+    "UICreator",
     "BattleUICreator",
 ]

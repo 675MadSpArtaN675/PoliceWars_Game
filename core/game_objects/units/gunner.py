@@ -22,7 +22,7 @@ class GunnerUnit(MeleeUnit):
 
     _ray_height_indent: int = 0
 
-    _is_can_shoot: bool = False
+    _is_can_shoot: bool = True
     _is_shooting: bool = False
 
     def __init__(
@@ -70,12 +70,16 @@ class GunnerUnit(MeleeUnit):
             ray_height_indent=ray_height_indent,
         )
 
-        self._detector_configure()
+        self._initialize()
 
     def _detector_configure(self):
-        detector = super()._detector_configure()
+        super()._detector_configure()
 
-        if not self._off_shoot_detector and self._sprite is not None:
+        if (
+            not self._off_shoot_detector
+            and self._sprite is not None
+            and self._shoot_enemy_detector is None
+        ):
             pos, width, height = self._calculate_ray_pos(
                 self._position, self._sprite.rect.width, self._sprite.rect.height
             )
@@ -86,9 +90,19 @@ class GunnerUnit(MeleeUnit):
                 distance=self._shoot_distance,
                 position=pos,
             )
-            self._shoot_enemy_detector.refresh()
 
-        print(self._melee_detector, self._shoot_enemy_detector)
+            self._shoot_enemy_detector.add_filter(
+                lambda game_object: game_object is not None
+            )
+            self._shoot_enemy_detector.add_filter(
+                lambda game_object: not game_object.is_dead()
+            )
+            self._shoot_enemy_detector.add_filter(
+                lambda game_object: issubclass(type(game_object), MeleeUnit)
+                and not issubclass(type(game_object), Bullet)
+            )
+
+            self._shoot_enemy_detector.refresh()
 
     def _add_events(self):
         super()._add_events()
@@ -116,9 +130,6 @@ class GunnerUnit(MeleeUnit):
     def _set_shooting(self, flag: bool):
         self._is_shooting = flag
 
-    def render(self):
-        super().render()
-
     def is_detect_far(self, entities: list[MeleeUnit]):
         if self._shoot_enemy_detector is not None:
             if not self._shoot_enemy_detector.can_work:
@@ -129,14 +140,14 @@ class GunnerUnit(MeleeUnit):
         return ()
 
     def shoot(self, damage_modifier: float):
-        if self._is_shooting:
-            if self.is_can_shoot or self._using_bullet is not None:
-                return
+        if not self.is_can_shoot or self._using_bullet is None:
+            return
 
+        if self._is_shooting:
             damage = self._using_bullet.get_damage()
 
             bullet_pos = self._position.copy()
-            bullet_pos += self._bullet_settings.bullet_spawn_position.copy()
+            bullet_pos += self._using_bullet.get_position_offset().copy()
 
             bullet = self._using_bullet.copy()
             bullet.set_damage(damage * damage_modifier)
@@ -182,5 +193,6 @@ class GunnerUnit(MeleeUnit):
         object_copy._ray_height_indent = self._ray_height_indent
 
         object_copy._is_can_shoot = self._is_can_shoot
+        object_copy._initialize()
 
         return object_copy

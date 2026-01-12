@@ -53,7 +53,7 @@ class Cell(ClickableObject):
                 self.place_unit(unit)
 
             elif is_need_clear:
-                self.delete_unit()
+                self.clear()
 
     def place_unit(self, unit: MeleeUnit):
         if self._is_can_place and (self._unit is None or self._unit.is_dead()):
@@ -61,11 +61,12 @@ class Cell(ClickableObject):
             self._unit = unit
 
     def delete_unit(self):
-        self._unit.destroy()
-        self._unit = None
+        if self._unit is not None:
+            self._unit.destroy()
+            self._unit = None
 
     def clear(self):
-        if not self._unit.is_dead():
+        if self._unit is not None and not self._unit.is_dead():
             self.delete_unit()
 
     def get_unit(self):

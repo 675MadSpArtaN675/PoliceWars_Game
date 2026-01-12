@@ -1,106 +1,111 @@
-from ...sprites_types import SimpleSprite
+from ...sprites_types import SpriteBase
 
 from .. import GameLoopController
 
-from ...game_objects.abstract_objects import ClickableObject, GameObject
+from ...game_objects.abstract_objects import GameObject
 
 from ..unit_control import UnitChooser
+from ..texture_loader import TextureLoader
 
 from utility_classes.point import Point
 
-from .creator import Creator
-
-import pygame as pg
+from .ui_creator import UICreator
 
 
-class BattleUICreator(Creator):
-    _chooser: UnitChooser = None
-
-    _dx_between_buttons: int = 15
+class BattleUICreator(UICreator):
+    _dx_between_buttons: int = 25
 
     def __init__(
         self,
+        name: str,
         game_cycle: GameLoopController,
-        chooser: UnitChooser,
+        texture_loader: TextureLoader,
         distance_between_unit_button: int,
+        chooser: UnitChooser = None,
         start_objects: list[GameObject] = (),
     ):
-        super().__init__(game_cycle, start_objects)
+        super().__init__(name, game_cycle, texture_loader, chooser, start_objects)
 
-        self._chooser = chooser
         self._dx_between_buttons = distance_between_unit_button
 
     def create(self) -> list[GameObject]:
         super().create()
 
-        exit_button = self._create_exit_button(Point(950, 15))
-        pause_button = self._create_pause_game_button(Point(875, 15))
-        delete_mode_button = self._create_delete_mode_game_button(Point(800, 15))
+        unit_buttons = self._create_unit_buttons(
+            self._get_texture("unit_buttons"), self._get_texture("unit_buttons_clicked")
+        )
+        exit_button = self._create_exit_button(
+            self._get_texture("exit_button"), self._get_texture("exit_button_clicked")
+        )
+        pause_button = self._create_pause_game_button(
+            self._get_texture("pause_button"), self._get_texture("pause_button_clicked")
+        )
+        delete_mode_button = self._create_delete_mode_game_button(
+            self._get_texture("delete_mode_button"),
+            self._get_texture("delete_mode_button_clicked"),
+        )
 
-        self._create_unit_buttons(self._dx_between_buttons)
-
+        self._objects.extend(unit_buttons)
         self._objects.append(pause_button)
         self._objects.append(exit_button)
         self._objects.append(delete_mode_button)
 
         return self._objects
 
-    def _create_unit_buttons(self, _dx_between_buttons: int):
+    def _create_unit_buttons(
+        self,
+        cage_sprite: SpriteBase,
+        selection_sprite: SpriteBase,
+    ):
+        result = []
+
         dx = 0
-        dx_between_buttons = _dx_between_buttons
-        pos = Point(50, 15)
+        pos = self._buttons_positions.get("unit_buttons", Point())
         for func in self._chooser.get_setter_functions():
             unit_button = self._create_button(
-                SimpleSprite(50, 50, pg.Color(0, 0, 50 + dx)),
-                SimpleSprite(50, 50),
-                pos.copy(),
-                func,
+                cage_sprite, selection_sprite, pos.copy(), func, 100
             )
 
             if dx == 0:
-                dx += 50 + dx_between_buttons
+                dx += 50 + self._dx_between_buttons
 
             pos += Point(dx, 0)
 
-            self._objects.append(unit_button)
+            result.append(unit_button)
 
-    def _create_exit_button(self, position: Point):
-        return self._create_button(
-            SimpleSprite(50, 50, pg.Color(0, 0, 50)),
-            SimpleSprite(50, 50),
-            position,
-            self._game_cycle.nice_quit,
-        )
+        return result
 
-    def _create_pause_game_button(self, position: Point):
-        return self._create_button(
-            SimpleSprite(50, 50, pg.Color(0, 0, 50)),
-            SimpleSprite(50, 50),
-            position,
-            self._game_cycle.pause_toggle,
-        )
-
-    def _create_delete_mode_game_button(self, position: Point):
-        return self._create_button(
-            SimpleSprite(50, 50, pg.Color(0, 0, 50)),
-            SimpleSprite(50, 50),
-            position,
-            self._game_cycle.delete_mode_toggle,
-        )
-
-    def _create_button(
+    def _create_exit_button(
         self,
-        primary_sprite: SimpleSprite,
-        secondary_sprite: SimpleSprite,
-        position: Point,
-        on_clicked_button,
+        primary_sprite: SpriteBase,
+        selection_sprite: SpriteBase,
     ):
-        button = ClickableObject(
-            screen=self._game_cycle.screen,
-            sprite=primary_sprite,
-            secondary_sprite=secondary_sprite,
-            position=position,
+        return self._create_button(
+            primary_sprite,
+            selection_sprite,
+            self._buttons_positions.get("exit_button", Point()),
+            self._game_cycle.nice_quit,
+            100,
         )
-        button.on_click_bind(on_clicked_button)
 
-        return button
+    def _create_pause_game_button(
+        self, primary_sprite: SpriteBase, selection_sprite: SpriteBase
+    ):
+        return self._create_button(
+            primary_sprite,
+            selection_sprite,
+            self._buttons_positions.get("pause_button", Point()),
+            self._game_cycle.pause_toggle,
+            100,
+        )
+
+    def _create_delete_mode_game_button(
+        self, primary_sprite: SpriteBase, selection_sprite: SpriteBase
+    ):
+        return self._create_button(
+            primary_sprite,
+            selection_sprite,
+            self._buttons_positions.get("delete_mode_button", Point()),
+            self._game_cycle.delete_mode_toggle,
+            100,
+        )

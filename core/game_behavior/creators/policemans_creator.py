@@ -15,8 +15,7 @@ class PolicemansCreator(Creator):
         start_units: list[MeleeUnit] = (),
         start_working_units: list[MeleeUnit] = (),
     ):
-        super().__init__(game_cycle, start_units)
-        self._game_cycle = game_cycle
+        super().__init__(game_cycle, None, start_units)
 
         self._start_working_unit = start_working_units
         self._working_objects = list(start_working_units)

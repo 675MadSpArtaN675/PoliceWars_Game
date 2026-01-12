@@ -20,10 +20,19 @@ class Point:
 
         return self
 
-    def __iadd__(self, other):
-        return self.__add__(other)
+    def __mul__(self, other):
+        self.x *= other.x
+        self.y *= other.y
+
+        return self
 
     def __div__(self, other):
+        self.x /= other.x
+        self.y /= other.y
+
+        return self
+
+    def __sub__(self, other):
         self.x -= other.x
         self.y -= other.y
 

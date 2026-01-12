@@ -36,7 +36,7 @@ class UnitProcessor:
             unit.event_timer_tick(delta_time)
 
             objects_to_collide_list = self._union_list(objects_to_collide_list)
-            print(unit, objects_to_collide_list)
+
             if unit.health <= 0.0 and not unit.is_invulerable:
                 unit.killself()
 
@@ -49,7 +49,7 @@ class UnitProcessor:
 
     def _gunner_shoot(
         self,
-        unit: MeleeUnit | GunnerUnit,
+        unit: GunnerUnit,
         objects_to_collide_list: list[MeleeUnit | GunnerUnit],
         collide: bool,
     ):

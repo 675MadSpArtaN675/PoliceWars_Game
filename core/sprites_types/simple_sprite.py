@@ -1,33 +1,33 @@
-from utility_classes.size import Size
+from utility_classes import Point
+
+from .sprite_base import SpriteBase
+from .data import ImageOptions, FlipSide
 
 import pygame as pg
 
-import pathlib as pl
 
+class SimpleSprite(SpriteBase):
+    _data: ImageOptions = None
 
-class SimpleSprite(pg.sprite.Sprite):
-    __image_path: str = None
-    __resourse_image: str = None
     _color: pg.Color = None
-
-    _image: pg.Surface = None
-    _rect: pg.Rect = None
 
     def __init__(
         self,
         width: int,
         height: int,
-        color: pg.Color = pg.Color(0, 0, 0),
-        image_path: str = None,
+        color: pg.Color = pg.Color(255, 255, 255),
+        data: ImageOptions = None,
+        is_alpha: bool = True,
     ):
-        super().__init__()
+        super().__init__(
+            width,
+            height,
+            is_alpha,
+        )
 
-        self.__image_path = image_path
-        self._image = pg.Surface((width, height))
-        self._rect = self._image.get_rect()
-
-        if image_path is not None and image_path.strip() != "":
-            self.__resourse_image = pg.image.load(image_path)
+        if data is not None:
+            self._data = data
+            self._source_size = data.get_source_size()
 
         self._color = color
 
@@ -40,11 +40,15 @@ class SimpleSprite(pg.sprite.Sprite):
         return self._rect
 
     def update(self, *args, **kwargs):
-        if self.__resourse_image is not None:
-            image = pg.transform.scale(
-                self.__resourse_image, (self._rect.width, self._rect.height)
+        if (
+            self._data is not None
+            and self._data.get_image() is not None
+            and self._data.position is not None
+        ):
+            self._image.blit(
+                pg.transform.flip(self._data.get_image(), *self._data.flip.value),
+                self._data.position.to_tuple(),
             )
-            self._image.blit(image, (0, 0))
 
         elif self._color is not None:
             self._image.fill(self._color)
@@ -53,22 +57,35 @@ class SimpleSprite(pg.sprite.Sprite):
         self._image = pg.Surface((width, height))
         self._rect = self._image.get_rect()
 
+    def get_size(self):
+        return self._rect.width, self._rect.height
+
+    def flip(self, how: FlipSide):
+        if type(how) == FlipSide:
+            self._data.flip = how
+            self._data.position = self._flip_position(self._data.position)
+
+    def _flip_position(self, position: Point):
+        width, height = self._source_size.to_tuple()
+        enum_value = self._data.flip.value
+
+        vertical_coof = width * enum_value[0]
+        horizontal_coof = height * enum_value[1]
+
+        return Point(vertical_coof, horizontal_coof) - position.copy()
+
     def copy(self):
         width = self._rect.width
         height = self._rect.height
+        data = self._data
 
-        sprite_copy = SimpleSprite(width, height)
+        if data is not None:
+            data = self._data.copy()
+
+        sprite_copy = SimpleSprite(width, height, data=data)
 
         sprite_copy._image = self._image.copy()
         sprite_copy._rect = self._image.get_rect()
         sprite_copy._color = pg.Color(self._color.r, self._color.g, self._color.b)
 
         return sprite_copy
-
-
-def load_sprite(path_to_image: str, size: Size):
-    path_image = pl.Path(path_to_image).absolute()
-    image = pg.image.load(path_image)
-    transformed_image = pg.transform.scale(image, size.to_tuple())
-
-    return SimpleSprite(*size, image_path=transformed_image)

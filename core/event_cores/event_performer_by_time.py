@@ -9,9 +9,42 @@ EventPerformer_ = Callable[[int], bool]
 Event = namedtuple("Event", "time_to_start, function_performer")
 
 
+class EventTime:
+    _time_to_start: int | float = 0
+    _function_performer: EventPerformer_ = None
+
+    is_performed_in_iteration: bool = False
+
+    def __init__(self, time_to_start: float | int, function_performer: EventPerformer_):
+        self._time_to_start = time_to_start
+        self._function_performer = function_performer
+
+    def __deepcopy__(self, memo):
+        object_copy = EventTime(self._time_to_start, self._function_performer)
+
+        memo[id(self)] = self
+        memo[id(object_copy)] = object_copy
+
+        return object_copy
+
+    @property
+    def time_to_start(self):
+        return self._time_to_start
+
+    @property
+    def function_performer(self):
+        return self._function_performer
+
+    def set_performed_status(self, flag: bool):
+        self.is_performed_in_iteration = flag
+
+    def get_performed_status(self):
+        return self.is_performed_in_iteration
+
+
 class EventPerformerByTime:
     _time: int | float = 0
-    _events: dict[str, Event] = None
+    _events: dict[str, EventTime] = None
 
     def __init__(self):
         self._events = dict()
@@ -26,8 +59,17 @@ class EventPerformerByTime:
         if is_clear_timer:
             self._clear_if_greater_or_equal_max_time()
 
+        self.clear_performed_status()
+
+    def clear(self):
+        self._events.clear()
+
     def clear_time(self):
         self._time = 0
+
+    def clear_performed_status(self):
+        for event in self._events.values():
+            event.is_performed_in_iteration = False
 
     def add(
         self,
@@ -35,11 +77,11 @@ class EventPerformerByTime:
         time_to_start_in_seconds: int | float,
         performer: EventPerformer_,
     ):
-        new_event = Event(time_to_start_in_seconds, performer)
+        new_event = EventTime(time_to_start_in_seconds, performer)
 
         self._add(name, new_event)
 
-    def _add(self, name: str, new_event: Event):
+    def _add(self, name: str, new_event: EventTime):
         if self.is_has_event_with_name(name):
             raise ValueError(f"Event with name {name} already exists")
 
@@ -63,7 +105,7 @@ class EventPerformerByTime:
             lambda _, event: m.abs(event.time_to_start - time) <= eps
         )
 
-    def remove_by_predicate(self, predicate: Callable[[Event], bool]):
+    def remove_by_predicate(self, predicate: Callable[[EventTime], bool]):
         if not self.is_empty():
             for name, event in self._events.items():
                 if predicate(name, event):
@@ -75,7 +117,7 @@ class EventPerformerByTime:
                 self._events.values(), key=lambda x: x.time_to_start
             ).time_to_start
 
-            if self._time >= max_time:
+            if self._time - max_time > 0.0:
                 self.clear_time()
 
     def _perform_event(self, now_time: int | float, name: str):
@@ -86,8 +128,13 @@ class EventPerformerByTime:
             time_to_start = event.time_to_start
             performer = event.function_performer
 
-            if now_time >= time_to_start and performer is not None:
-                performer(now_time)
+            delta_now_max = now_time - time_to_start
+
+            if delta_now_max > 0.0 and delta_now_max < 0.02 and performer is not None:
+                if not event.is_performed_in_iteration:
+                    performer(now_time)
+                    event.is_performed_in_iteration = True
+
                 is_called = True
 
         return is_called

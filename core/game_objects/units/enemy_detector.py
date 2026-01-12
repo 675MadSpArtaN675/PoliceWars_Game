@@ -33,7 +33,6 @@ class Detector(GameObject):
     ):
         super().__init__(screen=screen, sprite=None, position=position, depth=depth)
 
-        cell_size.height *= 0.8
         self._cell_size = cell_size
         self._detection_distance = distance
         self._ignore_units = ignore_units
@@ -99,14 +98,17 @@ class Detector(GameObject):
             self._detected_entities.clear()
 
     def _filter_entities(self, entities: list[GameObject]):
-        result = list(entities).copy()
-        for entity in result:
-            answers = all([filter_func(entity) for filter_func in self._filters])
+        if len(self._filters) <= 0:
+            return entities
 
-            if answers:
-                result.remove(entity)
+        result = []
+        for entity in entities:
+            answer = [filter_func(entity) for filter_func in self._filters]
 
-        return result
+            if all(answer):
+                result.append(entity)
+
+        return tuple(result)
 
     def __deepcopy__(self, memo: dict[int, GameObject]):
         object_copy = super().__deepcopy__(memo)

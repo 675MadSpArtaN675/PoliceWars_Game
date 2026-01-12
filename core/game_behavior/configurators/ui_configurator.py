@@ -1,26 +1,31 @@
 from .. import GameLoopController
+from ..texture_loader import TextureLoader
 
-from ..unit_control import UnitChooser
-
-from ..creators import Creator
+from ..creators import UICreator
 
 
 class UIConfigurator:
-    _chooser: UnitChooser
     _game: GameLoopController
 
-    _objects: dict[str, Creator] = None
+    _objects: dict[str, UICreator] = None
 
-    def __init__(self, game_cycle: GameLoopController, chooser: UnitChooser):
+    def __init__(self, game_cycle: GameLoopController):
         self._objects = dict()
 
         self._game = game_cycle
-        self._chooser = chooser
 
-    def configure_window(self, name: str, creator_type: type, *args):
-        self._objects[name] = creator_type(self._game, self._chooser, *args)
+    def configure_window(
+        self,
+        name: str,
+        creator_type: type[UICreator],
+        textures_loader: TextureLoader,
+        *args,
+    ):
+        creator = creator_type(name, self._game, textures_loader, *args)
 
-        return self._objects
+        self._objects[name] = creator
+
+        return self._objects[name]
 
     def get_ui_window(self, window_name: str):
         ui = self._objects.get(window_name)

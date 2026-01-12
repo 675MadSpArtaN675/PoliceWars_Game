@@ -4,9 +4,11 @@ from .unit_control.unit_chooser import UnitChooser
 from .action_performer import ActionPerformer
 
 from .texture_loader import TextureLoader
+from .sprite_parser import ImageParser
 
+from .map_configurator import LevelConfigurer
 from .object_deleter import ObjectDeleter
-from .object_manager import ObjectManager
+from .frame_processor import FrameProcessor
 from .unit_processor import UnitProcessor
 
 from . import painters
@@ -22,8 +24,12 @@ __all__ = [
     "TextureLoader",
     "GameLoopController",
     "ObjectDeleter",
-    "ObjectManager",
+    "FrameProcessor",
+    "LevelConfigurer",
     "MouseButton",
+    "ImageParser",
+    "ImageOptions",
+    "SpriteType",
     "configurators",
     "painters",
 ]

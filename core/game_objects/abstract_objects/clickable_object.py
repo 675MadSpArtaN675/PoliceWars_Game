@@ -17,6 +17,8 @@ class ClickableObject(GameObject):
     _cursor_on_object: bool = False
     _once_enter: bool = False
     _one_render: bool = False
+    _rendering: bool = False
+
     _clicked: bool = False
 
     _on_click: Callable = None
@@ -58,22 +60,29 @@ class ClickableObject(GameObject):
         return self._clicked
 
     def render(self):
-        if self._is_renderable:
+        if self._is_renderable and not self.is_dead():
+            self._set_sprite_rect_pos(self._sprite, self._position)
+            self._sprite.update()
+
+            sprite_image = self._sprite.image.copy()
+            sprite_rect = self._sprite.rect
+
+            if self._rendering:
+                self._secondary_sprite.update()
+                sprite_image.blit(self._secondary_sprite.image, (0, 0))
+
+            self._screen_to_render.blit(sprite_image, sprite_rect)
+
             if self._once_enter and not self._one_render:
-                self._sprite, self._secondary_sprite = (
-                    self._secondary_sprite,
-                    self._sprite,
-                )
+                self._rendering = True
                 self._one_render = True
 
             elif not self._once_enter and self._one_render:
-                self._sprite, self._secondary_sprite = (
-                    self._secondary_sprite,
-                    self._sprite,
-                )
+                self._rendering = False
                 self._one_render = False
 
-        super().render()
+            if self._on_render is not None:
+                self._on_render()
 
     def detect(self):
         x, y = pg.mouse.get_pos()

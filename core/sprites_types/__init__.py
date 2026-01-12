@@ -1,4 +1,8 @@
-from .simple_sprite import SimpleSprite, load_sprite
-from .animated_sprite import AnimatedSprite
+from .sprite_base import SpriteBase
+from .sprite_hub import SpriteHub
+from .simple_sprite import SimpleSprite
+from .animator import Animator
 
-__all__ = ["SimpleSprite", "AnimatedSprite", "load_sprite"]
+from . import data
+
+__all__ = ["SpriteBase", "SpriteHub", "SimpleSprite", "Animator", "data"]

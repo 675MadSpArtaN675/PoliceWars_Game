@@ -1,7 +1,7 @@
 from utility_classes.point import Point
 from utility_classes.size import Size
 
-from ...sprites_types import SimpleSprite
+from ...sprites_types import SimpleSprite, SpriteBase
 
 from typing import Callable
 
@@ -60,7 +60,7 @@ class GameObject:
         return self._sprite.rect.center
 
     def render(self):
-        self._sprite.rect.x, self._sprite.rect.y = self._position.to_tuple()
+        self._set_sprite_rect_pos(self._sprite, self._position)
 
         if self.is_renderable and not self._is_dead:
             self._sprite.update()
@@ -68,6 +68,9 @@ class GameObject:
 
             if self._on_render is not None:
                 self._on_render()
+
+    def _set_sprite_rect_pos(self, sprite: SpriteBase, position: Point):
+        sprite.rect.x, sprite.rect.y = position.to_tuple()
 
     def destroy(self):
         self._sprite.kill()

@@ -8,6 +8,7 @@ from ...sprites_types import SimpleSprite
 
 from ...event_cores import EventPerformerByTime as PerformerByTime
 
+
 from utility_classes.point import Point
 from utility_classes.size import Size
 
@@ -50,7 +51,7 @@ class MeleeUnit(ClickableObject, CollideableObject):
         self,
         *,
         screen: pg.Surface = None,
-        sprite: SimpleSprite = SimpleSprite(50, 50),
+        sprite: SimpleSprite = None,
         health: int = 100,
         damage: int = 0,
         speed: int = 0,
@@ -86,21 +87,28 @@ class MeleeUnit(ClickableObject, CollideableObject):
 
         self._off_melee_detector = off_detector
 
-        self.initialize()
+        self._initialize()
 
-    def initialize(self):
+    def _initialize(self):
         self._detector_configure()
         self.__configure_timer()
 
     def __configure_timer(self):
         if self._events_timer is not None:
+            self._events_timer.clear()
+            self._events_timer.clear_time()
+
             self._add_events()
 
         if not self._events_timer.is_has_event_with_name("melee_attack"):
             self._enable_non_timer_attack()
 
     def _detector_configure(self):
-        if not self._off_melee_detector and self._sprite is not None:
+        if (
+            not self._off_melee_detector
+            and self._sprite is not None
+            and self._melee_detector is None
+        ):
             pos, width, height = self._calculate_ray_pos(
                 self._position, self._sprite.rect.width, self._sprite.rect.height
             )
@@ -136,7 +144,7 @@ class MeleeUnit(ClickableObject, CollideableObject):
         if height_ <= 0:
             height_ = 5
 
-        return pos, width_, height_
+        return pos, width_, height_ * 0.8
 
     @property
     def is_can_move(self):
@@ -230,7 +238,7 @@ class MeleeUnit(ClickableObject, CollideableObject):
             raise TypeError(
                 f"Modificator must be a float not {type(damage_modificator)}"
             )
-        print(self.is_can_attack, self._is_attacking, not self.is_dead())
+
         if self.is_can_attack and self._is_attacking and not self.is_dead():
             damage = self._damage * damage_modificator
             health_remains = entity.get_damage(self, damage)
@@ -284,5 +292,6 @@ class MeleeUnit(ClickableObject, CollideableObject):
         object_copy._off_melee_detector = self._off_melee_detector
 
         object_copy._events_timer = self._copy_linked_objects(self._events_timer)
+        object_copy._initialize()
 
         return object_copy

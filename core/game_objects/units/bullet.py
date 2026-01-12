@@ -19,7 +19,7 @@ class BulletData:
 
     bullet_spawn_offset: Point
 
-    def __deepcopy__(self):
+    def __deepcopy__(self, memo):
         return BulletData(
             self.health, self.speed, self.damage, self.bullet_spawn_offset.copy()
         )
@@ -45,9 +45,9 @@ class Bullet(MeleeUnit):
         super().__init__(
             screen=screen,
             sprite=sprite,
-            health=bullet_data.health,
-            damage=bullet_data.damage,
-            speed=bullet_data.speed,
+            health=bullet_data.health if bullet_data is not None else 0,
+            damage=bullet_data.damage if bullet_data is not None else 0,
+            speed=bullet_data.speed if bullet_data is not None else 0,
             team=team,
             position=position,
             restricted_objects=restricted_objects,
@@ -70,6 +70,9 @@ class Bullet(MeleeUnit):
     def set_speed(self, speed: int | float):
         self._bullet_data.speed = speed
 
+    def set_position_offset(self, point: Point):
+        self._bullet_data.bullet_spawn_offset = point
+
     def get_health(self):
         return self._bullet_data.health
 
@@ -78,6 +81,9 @@ class Bullet(MeleeUnit):
 
     def get_speed(self):
         return self._bullet_data.speed
+
+    def get_position_offset(self):
+        return self._bullet_data.bullet_spawn_offset
 
     def attack(self, entity: GameObject, damage_modificator: float):
         if super().attack(entity, damage_modificator):

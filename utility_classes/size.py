@@ -28,8 +28,55 @@ class Size:
         else:
             raise ValueError("Height must be greater than zero")
 
+    def copy(self):
+        return Size(*self.to_tuple())
+
     def to_tuple(self):
         return (self._width, self._height)
+
+    def __add__(self, value: int | tuple | float):
+        if type(value) in (int, float):
+            self._width += value
+            self._height += value
+
+        elif type(value) == tuple:
+            self._width += value[0]
+            self._height += value[1]
+
+        return self
+
+    def __mul__(self, value: int | tuple | float):
+        if type(value) in (int, float):
+            self._width *= value
+            self._height *= value
+
+        elif type(value) == tuple:
+            self._width *= value[0]
+            self._height *= value[1]
+
+        return self
+
+    def __div__(self, value: int | tuple | float):
+        if type(value) in (int, float):
+            self._width /= value
+            self._height /= value
+
+        elif type(value) == tuple:
+            self._width /= value[0]
+            self._height /= value[1]
+
+        return self
+
+    def __sub__(self, value: int | tuple | float):
+        if type(value) in (int, float):
+            self._width -= value
+            self._height -= value
+
+        elif type(value) == tuple:
+            self._width -= value[0]
+            self._height -= value[1]
+
+        return self
 
     def __deepcopy__(self, memo: dict[int, object]):
         size_copy = type(self)(self.width, self.height)

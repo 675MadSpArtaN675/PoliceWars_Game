@@ -115,14 +115,14 @@ class UnitGrid(GameObject):
     def selected_cell_sprite(self):
         return self._selected_sprite
 
-    @cell_sprite.setter
+    @selected_cell_sprite.setter
     def selected_cell_sprite(self, value: SimpleSprite):
         self._selected_sprite = value
 
     def build(self):
         if (
             self._screen_to_render is not None
-            and self.row_count > 0
+            and self._row_count > 0
             and self._column_count > 0
             and self._sprite is not None
             and self._selected_sprite is not None
@@ -145,6 +145,9 @@ class UnitGrid(GameObject):
                 line.build()
 
                 self._grid.append(line)
+
+    def __len__(self):
+        return len(self._grid)
 
     def __deepcopy__(self, memo: dict[int, GameObject]):
         object_copy = super().__deepcopy__(memo)

@@ -22,5 +22,5 @@ class ObjectDeleter:
     def remove_dead_objects(self):
         for object_list in self._objects:
             for object_ in object_list:
-                if object_ is not None and object_ in object_list and object_.is_dead():
-                    del object_
+                if object_.is_dead():
+                    del object_list[object_list.index(object_)]

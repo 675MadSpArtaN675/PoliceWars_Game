@@ -1,4 +1,4 @@
-from ...sprites_types import SimpleSprite
+from ...sprites_types import SpriteBase, SimpleSprite
 
 from .. import GameLoopController
 
@@ -34,6 +34,10 @@ class MapObjectsCreator(Creator):
     _grid_size: Size = Size()
     _placer: Callable[[None], GameObject] = None
 
+    cell_size: Size = Size(64, 64)
+    unit_grid_position: Point = Point()
+    distance_in_cells_count: int = 1
+
     def __init__(
         self,
         game_cycle: GameLoopController,
@@ -65,21 +69,33 @@ class MapObjectsCreator(Creator):
         self._clickable_objects.clear()
         self._clickable_objects.extend(list(self._start_clickable_objects))
 
+        width, height = self.cell_size.to_tuple()
+
         unit_grid = self._create_unit_grid(
-            SimpleSprite(50, 50, pg.Color(255, 0, 0)),
-            SimpleSprite(50, 50, pg.Color(0, 0, 255)),
-            Point(100, 225),
+            self._get_texture("unit_cell"),
+            self._get_texture("selected_unit_cell"),
+            self.unit_grid_position.copy(),
         )
 
         self._clickable_objects.append(unit_grid)
 
-        pos = unit_grid.get_position().copy() + Point(-50 * 4 - 10, 25)
+        pos = self.unit_grid_position.copy() + Point(-width * 4 - 10, 25)
 
-        dead_zone = self._create_dead_zone(pos, False)
+        dead_zone = self._create_dead_zone(
+            SimpleSprite(width * 4, height * 6), pos, True
+        )
         self._objects.append(dead_zone)
 
-        pos = unit_grid.get_positions_of_last_points()[0] + Point(50, 0)
-        spawn_grid = self._create_enemy_spawner_grid(pos, Size(3, 5), 10, False)
+        pos_d = Point(width * self.distance_in_cells_count, 0)
+        pos = unit_grid.get_positions_of_last_points()[0] + pos_d
+
+        spawn_grid = self._create_enemy_spawner_grid(
+            SimpleSprite(width, height, pg.Color(255, 120, 0)),
+            pos,
+            Size(3, 5),
+            10,
+            True,
+        )
 
         self._objects.append(spawn_grid)
 
@@ -99,7 +115,7 @@ class MapObjectsCreator(Creator):
             screen=self._game_cycle.screen,
             rows=self._grid_size.width,
             columns=self._grid_size.height,
-            position=position,
+            position=position.copy(),
             depth=-100,
         )
 
@@ -113,10 +129,11 @@ class MapObjectsCreator(Creator):
 
         return unit_grid
 
-    def _create_dead_zone(self, position: Point, need_render: bool):
+    def _create_dead_zone(self, sprite: SpriteBase, position: Point, need_render: bool):
+
         dead_zone = PoliceDeadZone(
             game_cycle=self._game_cycle,
-            sprite=SimpleSprite(50 * 4, 50 * 6),
+            sprite=sprite,
             position=position,
         )
 
@@ -126,6 +143,7 @@ class MapObjectsCreator(Creator):
 
     def _create_enemy_spawner_grid(
         self,
+        sprite: SpriteBase,
         position: Point,
         size: Size,
         spawn_interval: int,
@@ -133,7 +151,7 @@ class MapObjectsCreator(Creator):
     ):
         spawn_grid = EnemySpawnerGrid(
             screen=self._game_cycle.screen,
-            sprite=SimpleSprite(50, 50, pg.Color(255, 120, 0)),
+            sprite=sprite,
             line_len=size.height,
             line_count=size.width,
             units=self._enemies,
