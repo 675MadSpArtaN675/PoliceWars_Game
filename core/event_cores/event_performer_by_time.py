@@ -6,7 +6,6 @@ from typing import Callable
 import math as m
 
 EventPerformer_ = Callable[[int], bool]
-Event = namedtuple("Event", "time_to_start, function_performer")
 
 
 class EventTime:
@@ -54,7 +53,7 @@ class EventPerformerByTime:
 
     def perform_events(self, is_clear_timer: bool = True):
         for name, _ in self._events.items():
-            self._perform_event(self._time, name)
+            self._perform_event(self._time, name, not is_clear_timer)
 
         if is_clear_timer:
             self._clear_if_greater_or_equal_max_time()
@@ -120,7 +119,7 @@ class EventPerformerByTime:
             if self._time - max_time > 0.0:
                 self.clear_time()
 
-    def _perform_event(self, now_time: int | float, name: str):
+    def _perform_event(self, now_time: int | float, name: str, is_need_clear: bool):
         event = self._events.get(name)
 
         is_called = False
@@ -130,7 +129,11 @@ class EventPerformerByTime:
 
             delta_now_max = now_time - time_to_start
 
-            if delta_now_max > 0.0 and delta_now_max < 0.02 and performer is not None:
+            if (
+                delta_now_max > 0.0
+                and (delta_now_max < 0.02 or is_need_clear)
+                and performer is not None
+            ):
                 if not event.is_performed_in_iteration:
                     performer(now_time)
                     event.is_performed_in_iteration = True

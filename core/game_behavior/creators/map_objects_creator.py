@@ -25,6 +25,7 @@ import pygame as pg
 
 
 class MapObjectsCreator(Creator):
+    category: str = "map_object_texture"
     _start_clickable_objects: list[ClickableObject] = None
 
     _objects: list[ProcessableObject] = None
@@ -72,8 +73,8 @@ class MapObjectsCreator(Creator):
         width, height = self.cell_size.to_tuple()
 
         unit_grid = self._create_unit_grid(
-            self._get_texture("unit_cell"),
-            self._get_texture("selected_unit_cell"),
+            self._get_texture("unit_cell", "base"),
+            self._get_texture("selected_unit_cell", "select"),
             self.unit_grid_position.copy(),
         )
 
@@ -93,7 +94,7 @@ class MapObjectsCreator(Creator):
             SimpleSprite(width, height, pg.Color(255, 120, 0)),
             pos,
             Size(3, 5),
-            10,
+            15,
             True,
         )
 

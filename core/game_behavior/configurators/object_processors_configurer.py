@@ -6,6 +6,7 @@ from ...game_objects.abstract_objects import (
     ClickableObject,
     ProcessableObject,
 )
+from ...event_cores import EventPerformerByTime
 from ...game_objects.units import MeleeUnit, Bullet
 
 from ..action_performer import ActionPerformer
@@ -79,6 +80,7 @@ class ObjectProcessorsConfigurer:
             objects_lists.clickable_map_objects,
             objects_lists.policemans_working_units,
             objects_lists.map_objects,
+            objects_lists.enemies_objects,
             objects_lists.ui_objects,
         )
 

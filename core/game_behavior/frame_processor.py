@@ -1,4 +1,5 @@
 from .configurators import PaintersConfigurer, ObjectProcessorsConfigurer
+from ..event_cores import EventPerformerByTime
 
 import pygame as pg
 
@@ -6,12 +7,17 @@ import pygame as pg
 class FrameProcessor:
     _configured_painters: PaintersConfigurer
     _objects_processors: ObjectProcessorsConfigurer
+    _timed_events: EventPerformerByTime
 
     def __init__(
-        self, painters: PaintersConfigurer, processors: ObjectProcessorsConfigurer
+        self,
+        painters: PaintersConfigurer,
+        processors: ObjectProcessorsConfigurer,
+        event_performer: EventPerformerByTime,
     ):
         self._configured_painters = painters
         self._objects_processors = processors
+        self._timed_events = event_performer
 
     def Draw(
         self,
@@ -21,6 +27,9 @@ class FrameProcessor:
         is_ended: bool,
     ):
         surface.fill(pg.Color(0, 255, 0))
+
+        self._timed_events.tick(delta_time)
+        self._timed_events.perform_events(False)
 
         self._objects_processors.ui_performer.perform()
 

@@ -45,8 +45,8 @@ class Creator:
 
         return self
 
-    def _get_texture(self, name: str):
-        return self._textures.get_texture(self.category, name)
+    def _get_texture(self, name: str, state: str):
+        return self._textures.get_texture(self.category, name, state)
 
     def create(self) -> list[GameObject]:
         self._objects.clear()

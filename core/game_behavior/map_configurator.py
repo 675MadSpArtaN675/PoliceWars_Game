@@ -1,3 +1,5 @@
+from .win_lose_controller import WinLoseController
+
 from .game_loop_controller import GameLoopController
 from .frame_processor import FrameProcessor
 from .texture_loader import TextureLoader
@@ -10,6 +12,7 @@ from .configurators import (
     UIConfigurator,
 )
 
+from ..event_cores import EventPerformerByTime
 from ..game_objects.units import MeleeUnit
 
 from .configurators import UIConfigurator
@@ -22,6 +25,7 @@ from .creators import (
 
 
 from utility_classes import Size, Point
+from typing import Callable
 
 
 class LevelConfigurer:
@@ -29,13 +33,14 @@ class LevelConfigurer:
     _plant_grid_size: Size = None
 
     _ui_configurer: UIConfigurator = None
-    _creators_configurer: ObjectCreatorsConfigurer = None
     _painters: PaintersConfigurer = None
     _object_processor: ObjectProcessorsConfigurer = None
     _game_configurer: GameCycleAdditionsConfigurator = None
     _frame_processor: FrameProcessor = None
 
     _texture_loader: TextureLoader = None
+
+    creators_configurer: ObjectCreatorsConfigurer = None
 
     def __init__(
         self,
@@ -75,22 +80,31 @@ class LevelConfigurer:
         map_object_creator.unit_grid_position = grid_position
         map_object_creator.distance_in_cells_count = distance_between_grid_and_spawners
 
-        self._creators_configurer = ObjectCreatorsConfigurer(
+        self.creators_configurer = ObjectCreatorsConfigurer(
             map_object_creator,
             bullet_creator,
             enemy_creator,
             policeman_creator,
         )
 
-    def configure_game(self, window_name: str):
-        self._creators_configurer.ui_creator = self._ui_configurer.get_ui_window(
+    def configure_game(self, window_name: str, time_to_win: int):
+        self.creators_configurer.ui_creator = self._ui_configurer.get_ui_window(
             window_name
         )
 
-        self._painters = PaintersConfigurer(*self._creators_configurer.get_creators())
+        win_lose = WinLoseController(
+            self._game, self.creators_configurer.enemy_creator.get_objects()
+        )
+
+        self._time_event_controller = EventPerformerByTime()
+        self._time_event_controller.add(
+            "win", time_to_win, win_lose.finish_game_when_time_no_remains
+        )
+
+        self._painters = PaintersConfigurer(*self.creators_configurer.get_creators())
         self._painters.get_painters()
 
-        self._object_processor = ObjectProcessorsConfigurer(self._creators_configurer)
+        self._object_processor = ObjectProcessorsConfigurer(self.creators_configurer)
         self._object_processor.configure()
 
         self._game_configurer = GameCycleAdditionsConfigurator(
@@ -100,7 +114,7 @@ class LevelConfigurer:
         )
 
         self._game_configurer.ConfigureChooser(
-            self._creators_configurer.get_objects().policemans
+            self.creators_configurer.get_objects().policemans
         )
         self._game_configurer.ConfigureEventListeners()
 
@@ -109,13 +123,15 @@ class LevelConfigurer:
             self._game_configurer.chooser,
         )
 
-        self._creators_configurer.ui_creator.chooser = self._game_configurer.chooser
+        self.creators_configurer.ui_creator.chooser = self._game_configurer.chooser
 
-        self._creators_configurer.create(
+        self.creators_configurer.create(
             self._object_processor.get_unit_place_function()
         )
 
-        self._frame_processor = FrameProcessor(self._painters, self._object_processor)
+        self._frame_processor = FrameProcessor(
+            self._painters, self._object_processor, self._time_event_controller
+        )
 
     def get_frame_drawer(self):
         if self._frame_processor is not None:

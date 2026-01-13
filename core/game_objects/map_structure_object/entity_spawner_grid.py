@@ -59,7 +59,7 @@ class EnemySpawnerGrid(GameObject, ProcessableObject):
         if not self._is_spawn_blocked and self._time >= self._spawn_interval:
             enemies: list[MeleeUnit] = kwargs.get("enemies")
 
-            if enemies is not None:
+            if enemies is not None and len(enemies) <= 0:
                 spawned_enemies = self.spawn(10)
                 enemies.extend(spawned_enemies)
 

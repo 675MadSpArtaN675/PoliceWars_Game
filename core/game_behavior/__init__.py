@@ -11,6 +11,8 @@ from .object_deleter import ObjectDeleter
 from .frame_processor import FrameProcessor
 from .unit_processor import UnitProcessor
 
+from .win_lose_controller import WinLoseController
+
 from . import painters
 from . import configurators
 
@@ -30,6 +32,7 @@ __all__ = [
     "ImageParser",
     "ImageOptions",
     "SpriteType",
+    "WinLoseController",
     "configurators",
     "painters",
 ]

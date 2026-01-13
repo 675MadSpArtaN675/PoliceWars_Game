@@ -13,6 +13,7 @@ from .ui_creator import UICreator
 
 
 class BattleUICreator(UICreator):
+    category: str = "ui"
     _dx_between_buttons: int = 25
 
     def __init__(
@@ -32,17 +33,20 @@ class BattleUICreator(UICreator):
         super().create()
 
         unit_buttons = self._create_unit_buttons(
-            self._get_texture("unit_buttons"), self._get_texture("unit_buttons_clicked")
+            self._get_texture("unit_buttons", "base"),
+            self._get_texture("unit_buttons", "select"),
         )
         exit_button = self._create_exit_button(
-            self._get_texture("exit_button"), self._get_texture("exit_button_clicked")
+            self._get_texture("exit_button", "base"),
+            self._get_texture("exit_button", "select"),
         )
         pause_button = self._create_pause_game_button(
-            self._get_texture("pause_button"), self._get_texture("pause_button_clicked")
+            self._get_texture("pause_button", "base"),
+            self._get_texture("pause_button", "select"),
         )
         delete_mode_button = self._create_delete_mode_game_button(
-            self._get_texture("delete_mode_button"),
-            self._get_texture("delete_mode_button_clicked"),
+            self._get_texture("delete_mode_button", "base"),
+            self._get_texture("delete_mode_button", "select"),
         )
 
         self._objects.extend(unit_buttons)
