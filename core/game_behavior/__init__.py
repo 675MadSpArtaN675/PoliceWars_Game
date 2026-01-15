@@ -12,6 +12,7 @@ from .frame_processor import FrameProcessor
 from .unit_processor import UnitProcessor
 
 from .win_lose_controller import WinLoseController
+from .bank_system import BankSystem
 
 from . import painters
 from . import configurators
@@ -33,6 +34,7 @@ __all__ = [
     "ImageOptions",
     "SpriteType",
     "WinLoseController",
+    "BankSystem",
     "configurators",
     "painters",
 ]

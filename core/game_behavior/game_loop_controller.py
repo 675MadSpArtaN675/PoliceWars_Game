@@ -23,6 +23,11 @@ class GameLoopController:
         else:
             self._loop_state = loop_data
 
+        self._size = window_size
+
+    def get_window_size(self):
+        return self._size
+
     @property
     def screen(self):
         return self._loop_state.screen

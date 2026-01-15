@@ -6,7 +6,9 @@ from ...game_objects.abstract_objects import (
     ClickableObject,
     ProcessableObject,
 )
-from ...event_cores import EventPerformerByTime
+
+from ..bank_system import BankSystem
+
 from ...game_objects.units import MeleeUnit, Bullet
 
 from ..action_performer import ActionPerformer
@@ -30,11 +32,12 @@ class ObjectProcessorsConfigurer:
 
     object_deleter: ObjectDeleter = None
 
+    _bank_system: BankSystem = None
     _unit_processor: UnitProcessor = None
 
     _creators: ObjectCreatorsConfigurer = None
 
-    def __init__(self, creators: ObjectCreatorsConfigurer):
+    def __init__(self, creators: ObjectCreatorsConfigurer, start_money: int):
         self.ui_performer = ActionPerformer()
         self.ui_clicks_performer = ActionPerformer()
         self.detectable_objects_action_performer = ActionPerformer()
@@ -44,8 +47,8 @@ class ObjectProcessorsConfigurer:
         self.policemans_action_performer = ActionPerformer()
         self.bullet_action_performer = ActionPerformer()
 
+        self._bank_system = BankSystem(start_money)
         self.object_deleter = ObjectDeleter()
-
         self._creators = creators
 
     @property
@@ -89,9 +92,14 @@ class ObjectProcessorsConfigurer:
         _, working_units = self._creators.policemans_creator.get_objects()
         enemies_objects = self._creators.enemy_creator.get_objects()
 
-        self._unit_processor = UnitProcessor(game, chooser, working_units, bullets)
+        self._unit_processor = UnitProcessor(
+            game, chooser, working_units, bullets, self._bank_system
+        )
 
         self._configure_units(working_units, enemies_objects, bullets)
+
+    def get_bank_system(self):
+        return self._bank_system
 
     def get_unit_process_function(self):
         return self._unit_processor.process

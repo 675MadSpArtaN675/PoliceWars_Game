@@ -1,4 +1,4 @@
-from ..sprites_types import SimpleSprite
+from ..sprites_types import SimpleSprite, SpriteBase
 
 from .sprite_parser import ImageParser, ImageOptions
 
@@ -15,7 +15,7 @@ IMAGE_FORMAT = ".png"
 class TextureLoader:
     _image_parser: ImageParser = None
     _sprite_size: Size = None
-    _textures_dict: dict[str, dict[str, pg.Surface]] = None
+    _textures_dict: dict[str, dict[str, dict[str, SpriteBase]]] = None
 
     _texture_folder: pl.Path = None
 
@@ -99,7 +99,14 @@ class TextureLoader:
 
         return False
 
-    def get_texture(self, category: str, texture: str, state: str = ""):
+    def get_sprite(
+        self,
+        category: str,
+        texture: str,
+        state: str,
+        size: Size = None,
+        only_subimage: bool = False,
+    ):
         if not bool(state) and self.is_texture_exists(category, texture):
             category_ = self._textures_dict.get(category)
             texture_ = category_.get(texture)
@@ -109,7 +116,10 @@ class TextureLoader:
         if self.is_state_exists(category, texture, state):
             category_ = self._textures_dict.get(category)
             texture_ = category_.get(texture)
-            state_ = texture_.get(state)
+            state_ = texture_.get(state).copy()
+
+            if size is not None:
+                state_.set_size_with_subimage(*size.to_tuple(), only_subimage)
 
             return state_.copy()
 
@@ -121,6 +131,11 @@ class TextureLoader:
             *self._sprite_size.to_tuple(),
             pg.Color(color_byte_1, color_byte_2, color_byte_3),
         )
+
+    def get_texture(self, category: str, texture: str, state: str = ""):
+        sprite = self.get_sprite(category, texture, state)
+
+        return sprite.get_base_texture()
 
     def get_categories(self):
         return self._textures_dict.keys()

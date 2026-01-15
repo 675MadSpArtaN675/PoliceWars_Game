@@ -31,34 +31,40 @@ class SimpleSprite(SpriteBase):
 
         self._color = color
 
-    @property
-    def image(self):
-        return self._image
-
-    @property
-    def rect(self):
-        return self._rect
-
     def update(self, *args, **kwargs):
         if (
             self._data is not None
             and self._data.get_image() is not None
             and self._data.position is not None
         ):
+            image = self._data.get_image().copy()
+
+            if self._subimage_size is not None:
+                image = pg.transform.scale(image, self._subimage_size.to_tuple())
+
+            image = pg.transform.flip(
+                image,
+                *self._data.flip.value,
+            )
+
+            rect = image.get_rect()
+            rect.x, rect.y = self._data.position.to_tuple()
+
             self._image.blit(
-                pg.transform.flip(self._data.get_image(), *self._data.flip.value),
-                self._data.position.to_tuple(),
+                image,
+                rect,
             )
 
         elif self._color is not None:
             self._image.fill(self._color)
 
-    def set_size(self, width: int, height: int):
-        self._image = pg.Surface((width, height))
-        self._rect = self._image.get_rect()
+    def get_base_texture(self):
+        image = self._data.get_image()
 
-    def get_size(self):
-        return self._rect.width, self._rect.height
+        if image is not None:
+            return image
+
+        return self._color
 
     def flip(self, how: FlipSide):
         if type(how) == FlipSide:
@@ -84,6 +90,7 @@ class SimpleSprite(SpriteBase):
 
         sprite_copy = SimpleSprite(width, height, data=data)
 
+        sprite_copy._subimage_size = self._subimage_size
         sprite_copy._image = self._image.copy()
         sprite_copy._rect = self._image.get_rect()
         sprite_copy._color = pg.Color(self._color.r, self._color.g, self._color.b)

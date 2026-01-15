@@ -39,11 +39,11 @@ class Cell(ClickableObject):
 
         return Size(w, h)
 
-    def render(self):
-        super().render()
+    def render(self, **kwargs):
+        super().render(**kwargs)
 
         if self._unit is not None:
-            self._unit.render()
+            self._unit.render(**kwargs)
 
     def click(self):
         if self._once_enter and self._on_click is not None:

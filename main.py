@@ -24,6 +24,15 @@ game.init_loop()
 
 configs = [
     ImageOptions(
+        "map_object_texture",
+        "background",
+        "base",
+        SpriteType.Simple,
+        FlipSide.NoFlip,
+        Size(1.0, 1.0),
+        Point(0, 0),
+    ),
+    ImageOptions(
         "policeman",
         "policeman",
         "stay",
@@ -125,6 +134,51 @@ configs = [
         Size(1, 1),
         Point(0, -128),
     ),
+    ImageOptions(
+        "projectile",
+        "standart_bullet",
+        "base",
+        SpriteType.Simple,
+        FlipSide.NoFlip,
+        Size(1, 1),
+        Point(0, 0),
+    ),
+    ImageOptions(
+        "ui",
+        "exit_button",
+        "base",
+        SpriteType.Simple,
+        FlipSide.NoFlip,
+        Size(1, 1),
+        Point(0, 0),
+    ),
+    ImageOptions(
+        "ui",
+        "delete_mode_button",
+        "base",
+        SpriteType.Simple,
+        FlipSide.NoFlip,
+        Size(1, 1),
+        Point(0, 0),
+    ),
+    ImageOptions(
+        "ui",
+        "pause_button",
+        "base",
+        SpriteType.Simple,
+        FlipSide.NoFlip,
+        Size(1, 1),
+        Point(0, 0),
+    ),
+    ImageOptions(
+        "ui",
+        "unit_button",
+        "base",
+        SpriteType.Simple,
+        FlipSide.NoFlip,
+        Size(1, 1),
+        Point(0, 0),
+    ),
 ]
 
 texture_loader = TextureLoader("resourses/textures")
@@ -135,7 +189,7 @@ enemy_units = UnitList(
         UnitToSpawn(
             MeleeUnit(
                 screen=game.screen,
-                sprite=texture_loader.get_texture(
+                sprite=texture_loader.get_sprite(
                     "enemies", "standart_niggers", "standart_nigger"
                 ),
                 health=50,
@@ -149,7 +203,7 @@ enemy_units = UnitList(
         UnitToSpawn(
             MeleeUnit(
                 screen=game.screen,
-                sprite=texture_loader.get_texture(
+                sprite=texture_loader.get_sprite(
                     "enemies", "standart_niggers", "middle_nigger"
                 ),
                 health=125,
@@ -163,7 +217,7 @@ enemy_units = UnitList(
         UnitToSpawn(
             MeleeUnit(
                 screen=game.screen,
-                sprite=texture_loader.get_texture(
+                sprite=texture_loader.get_sprite(
                     "enemies", "standart_niggers", "strong_nigger"
                 ),
                 health=200,
@@ -177,48 +231,51 @@ enemy_units = UnitList(
     ]
 )
 
+bullet_texture = texture_loader.get_sprite(
+    "projectile", "standart_bullet", "base", Size(10, 10)
+)
+
+standart_bullet = Bullet(
+    screen=game.screen,
+    sprite=bullet_texture,
+    bullet_data=BulletData(20, 125, 20, Point(50, 15)),
+    team=UnitFraction.Police,
+)
+
 units_to_choose = [
     GunnerUnit(
         screen=game.screen,
-        sprite=texture_loader.get_texture("policeman", "policeman", "stay"),
+        sprite=texture_loader.get_sprite("policeman", "policeman", "stay"),
         health=100,
-        melee_damage=5,
-        bullet=Bullet(
-            screen=game.screen,
-            sprite=SimpleSprite(15, 15),
-            bullet_data=BulletData(20, 125, 20, Point(50, 15)),
-            team=UnitFraction.Police,
-        ),
+        melee_damage=10,
+        bullet=standart_bullet,
         speed=0,
         shoot_distance=7,
-        shoot_interval=1,
+        shoot_interval=5,
         team=UnitFraction.Police,
+        price=100,
     ),
     GunnerUnit(
         screen=game.screen,
-        sprite=texture_loader.get_texture("policeman", "middle_policeman", "stay"),
+        sprite=texture_loader.get_sprite("policeman", "middle_policeman", "stay"),
         health=100,
-        melee_damage=5,
-        bullet=Bullet(
-            screen=game.screen,
-            sprite=SimpleSprite(15, 15),
-            bullet_data=BulletData(100, 125, 20, Point(50, 15)),
-            team=UnitFraction.Police,
-        ),
+        melee_damage=10,
+        bullet=standart_bullet,
         speed=0,
         shoot_distance=10,
-        shoot_interval=0.1,
+        shoot_interval=4,
         team=UnitFraction.Police,
+        price=150,
     ),
 ]
 
 ui_config = {
     "unit_buttons": Point(25, 25),
+    "money_display": Point(25, 100),
     "exit_button": Point(win_size.width - 100, 25),
     "pause_button": Point(win_size.width - 170, 25),
     "delete_mode_button": Point(win_size.width - 100, win_size.height - 84),
 }
-
 
 ui_configurer = UIConfigurator(game)
 ui_configurer.configure_window(
@@ -228,9 +285,8 @@ ui_configurer.configure_window(
 
 level = LevelConfigurer(game, Size(5, 10), ui_configurer)
 level.textures_loader = texture_loader
-level.configure_creators(units_to_choose, enemy_units, Point(100, 225), 5)
-level.configure_game("battle_ui", 30)
-
+level.configure_creators(units_to_choose, enemy_units, Point(12, 152), 5)
+level.configure_game("battle_ui", 180, 0)
 
 game.start_cycle(level.get_frame_drawer())
 

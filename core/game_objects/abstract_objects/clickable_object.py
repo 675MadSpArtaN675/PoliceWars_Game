@@ -59,16 +59,16 @@ class ClickableObject(GameObject):
     def is_clicked(self):
         return self._clicked
 
-    def render(self):
+    def render(self, **kwargs):
         if self._is_renderable and not self.is_dead():
+            self._sprite.update(**kwargs)
             self._set_sprite_rect_pos(self._sprite, self._position)
-            self._sprite.update()
 
             sprite_image = self._sprite.image.copy()
             sprite_rect = self._sprite.rect
 
-            if self._rendering:
-                self._secondary_sprite.update()
+            if self._rendering and self._secondary_sprite is not None:
+                self._secondary_sprite.update(**kwargs)
                 sprite_image.blit(self._secondary_sprite.image, (0, 0))
 
             self._screen_to_render.blit(sprite_image, sprite_rect)

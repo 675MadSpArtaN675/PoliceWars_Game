@@ -57,11 +57,10 @@ class ImageParser:
 
     def parse_image(self, image_config: ImageOptions):
         texture = image_config.get_image()
-        size = (
-            Size(texture.get_rect().width, texture.get_rect().height)
-            * image_config.scale.to_tuple()
+        size = ImageOptions.set_size_with_scale(
+            Size(texture.get_rect().width, texture.get_rect().height),
+            image_config.scale,
         )
-
         scaled_texture = pg.transform.scale(texture, size.to_tuple())
         image_config.set_image(scaled_texture)
 

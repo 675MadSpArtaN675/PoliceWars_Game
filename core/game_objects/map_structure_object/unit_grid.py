@@ -67,9 +67,9 @@ class UnitGrid(GameObject):
         for line in self._grid:
             line.detect()
 
-    def render(self):
+    def render(self, **kwargs):
         for line in self._grid:
-            line.render()
+            line.render(**kwargs)
 
     def clear(self):
         for line in self._grid:

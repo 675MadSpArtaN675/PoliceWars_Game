@@ -63,9 +63,9 @@ class EnemySpawnerLine(GameObject):
         self._spawn_interval = spawn_interval
         self._is_spawn_blocked = is_spawn_blocked
 
-    def render(self):
+    def render(self, **kwargs):
         for cell in self._spawner_list:
-            cell.render()
+            cell.render(**kwargs)
 
     def build(self):
         pos = self._position.copy()

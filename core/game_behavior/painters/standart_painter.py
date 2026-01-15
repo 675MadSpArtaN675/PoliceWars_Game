@@ -33,14 +33,14 @@ class StandartPainter:
                 self._mechanic_objects.append(object_list)
                 self._sort_collection(object_list)
 
-    def paint(self):
+    def paint(self, delta_time: int | float, **kwargs):
         for game_object_list in self._mechanic_objects:
             for game_object in game_object_list:
-                game_object.render()
+                game_object.render(delta_time=delta_time, **kwargs)
 
         for game_object_list in self._objects:
             for game_object in game_object_list:
-                game_object.render()
+                game_object.render(delta_time=delta_time, **kwargs)
 
     def _sort_collection(self, objects: list[GameObject]):
         objects.sort(key=lambda x: x.get_depth())

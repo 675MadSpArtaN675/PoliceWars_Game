@@ -36,7 +36,6 @@ class GameObject:
         self._screen_to_render = screen
         self._sprite = sprite
         self._position = position
-
         self._depth = depth
 
     @property
@@ -59,11 +58,14 @@ class GameObject:
     def center(self):
         return self._sprite.rect.center
 
-    def render(self):
+    def render(self, **kwargs):
         self._set_sprite_rect_pos(self._sprite, self._position)
+        self._set_sprite_rect_size(
+            self._sprite, Size(self._sprite.rect.width, self._sprite.rect.height)
+        )
 
         if self.is_renderable and not self._is_dead:
-            self._sprite.update()
+            self._sprite.update(**kwargs)
             self._screen_to_render.blit(self._sprite.image, self._sprite.rect)
 
             if self._on_render is not None:
@@ -71,6 +73,12 @@ class GameObject:
 
     def _set_sprite_rect_pos(self, sprite: SpriteBase, position: Point):
         sprite.rect.x, sprite.rect.y = position.to_tuple()
+
+    def _set_sprite_rect_size(self, sprite: SpriteBase, size: Size):
+        sprite.rect.width = size.width
+        sprite.rect.height = size.height
+
+        self._size = size
 
     def destroy(self):
         self._sprite.kill()
@@ -106,8 +114,7 @@ class GameObject:
 
     def set_size(self, size: Size):
         self._size = size
-        self._sprite.rect.width = self._size.width
-        self._sprite.rect.height = self._size.height
+        self._set_sprite_rect_size(self._sprite, self._size)
 
     def get_size(self):
         return self._size

@@ -53,7 +53,7 @@ class EventPerformerByTime:
 
     def perform_events(self, is_clear_timer: bool = True):
         for name, _ in self._events.items():
-            self._perform_event(self._time, name, not is_clear_timer)
+            self._perform_event(self._time, name)
 
         if is_clear_timer:
             self._clear_if_greater_or_equal_max_time()
@@ -116,10 +116,10 @@ class EventPerformerByTime:
                 self._events.values(), key=lambda x: x.time_to_start
             ).time_to_start
 
-            if self._time - max_time > 0.0:
+            if self._time - max_time >= 0:
                 self.clear_time()
 
-    def _perform_event(self, now_time: int | float, name: str, is_need_clear: bool):
+    def _perform_event(self, now_time: int | float, name: str):
         event = self._events.get(name)
 
         is_called = False
@@ -127,13 +127,7 @@ class EventPerformerByTime:
             time_to_start = event.time_to_start
             performer = event.function_performer
 
-            delta_now_max = now_time - time_to_start
-
-            if (
-                delta_now_max > 0.0
-                and (delta_now_max < 0.02 or is_need_clear)
-                and performer is not None
-            ):
+            if now_time > time_to_start and performer is not None:
                 if not event.is_performed_in_iteration:
                     performer(now_time)
                     event.is_performed_in_iteration = True

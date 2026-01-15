@@ -47,6 +47,8 @@ class MeleeUnit(ClickableObject, CollideableObject):
 
     _events_timer: PerformerByTime = None
 
+    _price: int = None
+
     def __init__(
         self,
         *,
@@ -62,6 +64,7 @@ class MeleeUnit(ClickableObject, CollideableObject):
         hit_distance: int = 1,
         ray_height_indent: int = 15,
         off_detector: bool = False,
+        price: int = 0,
         restricted_objects: list[type] = (),
     ):
         super().__init__(
@@ -86,7 +89,7 @@ class MeleeUnit(ClickableObject, CollideableObject):
         self._hit_distance = hit_distance
 
         self._off_melee_detector = off_detector
-
+        self._price = price
         self._initialize()
 
     def _initialize(self):
@@ -145,6 +148,10 @@ class MeleeUnit(ClickableObject, CollideableObject):
             height_ = 5
 
         return pos, width_, height_ * 0.8
+
+    @property
+    def price(self):
+        return self._price
 
     @property
     def is_can_move(self):
@@ -290,7 +297,7 @@ class MeleeUnit(ClickableObject, CollideableObject):
         )
 
         object_copy._off_melee_detector = self._off_melee_detector
-
+        object_copy._price = self._price
         object_copy._events_timer = self._copy_linked_objects(self._events_timer)
         object_copy._initialize()
 

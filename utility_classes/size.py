@@ -12,10 +12,7 @@ class Size:
 
     @width.setter
     def width(self, value: int):
-        if value > 0:
-            self._width = value
-        else:
-            raise ValueError("Width must be greater than zero")
+        self._width = value
 
     @property
     def height(self):
@@ -23,10 +20,7 @@ class Size:
 
     @height.setter
     def height(self, value: int):
-        if value > 0:
-            self._height = value
-        else:
-            raise ValueError("Height must be greater than zero")
+        self._height = value
 
     def copy(self):
         return Size(*self.to_tuple())

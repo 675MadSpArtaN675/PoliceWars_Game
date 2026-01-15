@@ -25,7 +25,6 @@ from .creators import (
 
 
 from utility_classes import Size, Point
-from typing import Callable
 
 
 class LevelConfigurer:
@@ -87,24 +86,29 @@ class LevelConfigurer:
             policeman_creator,
         )
 
-    def configure_game(self, window_name: str, time_to_win: int):
+    def configure_game(self, window_name: str, time_to_win: int, start_money: int):
         self.creators_configurer.ui_creator = self._ui_configurer.get_ui_window(
             window_name
         )
+
+        background = self._texture_loader.get_sprite(
+            "map_object_texture", "background", "base"
+        )
+        size = self._game.get_window_size()
+        size.width += 76
+
+        background.set_size_with_subimage(*size.to_tuple())
 
         win_lose = WinLoseController(
             self._game, self.creators_configurer.enemy_creator.get_objects()
         )
 
-        self._time_event_controller = EventPerformerByTime()
-        self._time_event_controller.add(
-            "win", time_to_win, win_lose.finish_game_when_time_no_remains
-        )
-
         self._painters = PaintersConfigurer(*self.creators_configurer.get_creators())
         self._painters.get_painters()
 
-        self._object_processor = ObjectProcessorsConfigurer(self.creators_configurer)
+        self._object_processor = ObjectProcessorsConfigurer(
+            self.creators_configurer, start_money
+        )
         self._object_processor.configure()
 
         self._game_configurer = GameCycleAdditionsConfigurator(
@@ -119,8 +123,7 @@ class LevelConfigurer:
         self._game_configurer.ConfigureEventListeners()
 
         self._object_processor.configure_unit_processor(
-            self._game,
-            self._game_configurer.chooser,
+            self._game, self._game_configurer.chooser
         )
 
         self.creators_configurer.ui_creator.chooser = self._game_configurer.chooser
@@ -129,8 +132,25 @@ class LevelConfigurer:
             self._object_processor.get_unit_place_function()
         )
 
+        self._time_event_controller = EventPerformerByTime()
+        self._time_event_controller.add(
+            "win", time_to_win, win_lose.finish_game_when_time_no_remains
+        )
+
+        self._cycled_time_event_controller = EventPerformerByTime()
+        self._cycled_time_event_controller.add(
+            "money_give",
+            5,
+            lambda _: self._object_processor.get_bank_system().add_money(50),
+        )
+
         self._frame_processor = FrameProcessor(
-            self._painters, self._object_processor, self._time_event_controller
+            self._painters,
+            self._object_processor,
+            self._time_event_controller,
+            self._cycled_time_event_controller,
+            background,
+            self._object_processor.get_bank_system(),
         )
 
     def get_frame_drawer(self):

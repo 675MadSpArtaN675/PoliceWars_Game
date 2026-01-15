@@ -35,6 +35,7 @@ class MapObjectsCreator(Creator):
     _grid_size: Size = Size()
     _placer: Callable[[None], GameObject] = None
 
+    debug_mode: bool = False
     cell_size: Size = Size(64, 64)
     unit_grid_position: Point = Point()
     distance_in_cells_count: int = 1
@@ -80,10 +81,10 @@ class MapObjectsCreator(Creator):
 
         self._clickable_objects.append(unit_grid)
 
-        pos = self.unit_grid_position.copy() + Point(-width * 4 - 10, 25)
+        pos = self.unit_grid_position.copy() + Point(-width * 5, 25)
 
         dead_zone = self._create_dead_zone(
-            SimpleSprite(width * 4, height * 6), pos, True
+            SimpleSprite(width * 4, height * 6), pos, self.debug_mode
         )
         self._objects.append(dead_zone)
 
@@ -95,7 +96,7 @@ class MapObjectsCreator(Creator):
             pos,
             Size(3, 5),
             15,
-            True,
+            self.debug_mode,
         )
 
         self._objects.append(spawn_grid)

@@ -51,9 +51,9 @@ class EnemySpawnerGrid(GameObject, ProcessableObject):
         self._spawn_interval = spawn_interval
         self._is_spawn_blocked = is_spawn_blocked
 
-    def render(self):
+    def render(self, **kwargs):
         for line in self._spawner_list:
-            line.render()
+            line.render(**kwargs)
 
     def process(self, delta_time: int | float, **kwargs):
         if not self._is_spawn_blocked and self._time >= self._spawn_interval:

@@ -15,9 +15,9 @@ class UnitChooser:
     def available_units(self):
         return self._chosen_unit_types
 
-    def get_setter_functions(self):
+    def get_units_with_their_setter_functions(self):
         return [
-            partial(self.choose_unit, index)
+            (self._chosen_unit_types[index], partial(self.choose_unit, index))
             for index in range(len(self._chosen_unit_types))
         ]
 
@@ -26,7 +26,7 @@ class UnitChooser:
 
     def extract_unit(self):
         if self._buffer is not None:
-            unit_type = deepcopy(self._buffer)
-            self._buffer = None
+            return deepcopy(self._buffer)
 
-            return unit_type
+    def clear_buffer(self):
+        self._buffer = None

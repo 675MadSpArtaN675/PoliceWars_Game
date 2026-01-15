@@ -18,10 +18,10 @@ class ObjectPainter(StandartPainter):
     def field_size(self, size: Size):
         self._policmans_field_size = size
 
-    def paint_background(self):
+    def paint_background(self, delta_time: int | float):
         if (
             self._policmans_field_size is not None
             and self._background_objects is not None
         ):
             for background_object in self._background_objects:
-                background_object.render()
+                background_object.render(delta_time)

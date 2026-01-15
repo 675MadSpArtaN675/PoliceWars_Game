@@ -9,6 +9,10 @@ import pygame as pg
 
 @dataclass
 class ImageOptions:
+    @staticmethod
+    def set_size_with_scale(size: Size, scale: Size):
+        return size * scale.to_tuple()
+
     category: str
     file_name: str
     name: str
@@ -25,7 +29,7 @@ class ImageOptions:
         self._image = image
 
     def get_image(self):
-        image = getattr(self, "_image", None)
+        image: pg.Surface = getattr(self, "_image", None)
 
         if image is not None:
             return image

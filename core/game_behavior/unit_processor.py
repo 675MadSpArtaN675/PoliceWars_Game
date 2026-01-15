@@ -2,12 +2,13 @@ from .game_loop_controller import GameLoopController
 
 from ..game_objects.units import MeleeUnit, GunnerUnit, Bullet
 
+from .bank_system import BankSystem
 from .unit_control import UnitChooser
 
 
 class UnitProcessor:
     _game_cycle: GameLoopController
-
+    _bank: BankSystem
     _chooser: UnitChooser
 
     _policemans: list[MeleeUnit]
@@ -19,12 +20,15 @@ class UnitProcessor:
         chooser: UnitChooser,
         policemans: list[MeleeUnit],
         bullets: list[Bullet],
+        bank_system: BankSystem,
     ):
         self._game_cycle = game_cycle
 
         self._chooser = chooser
         self._policemans = policemans
         self._bullets = bullets
+
+        self._bank = bank_system
 
     def process(
         self,
@@ -95,13 +99,18 @@ class UnitProcessor:
         if (
             not self._game_cycle.is_paused()
             and not self._game_cycle.is_delete_mode_activated()
+            and self._bank.is_can_get()
         ):
             unit = self._chooser.extract_unit()
 
-            if unit is not None:
-                self._policemans.append(unit)
+            if unit is not None and unit.price is not None:
+                if self._bank.can_pay(unit.price):
+                    self._policemans.append(unit)
+                    self._bank.get_money(unit.price)
 
-                return unit, False
+                    return unit, False
+
+            self._chooser.clear_buffer()
 
         elif (
             not self._game_cycle.is_paused()

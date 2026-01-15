@@ -53,9 +53,9 @@ class UnitLine(GameObject):
         for cell in self._unit_cells:
             cell.detect()
 
-    def render(self):
+    def render(self, **kwargs):
         for cell in self._unit_cells:
-            cell.render()
+            cell.render(**kwargs)
 
     def clear(self):
         for cell in self._unit_cells:

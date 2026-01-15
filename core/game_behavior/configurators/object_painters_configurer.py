@@ -37,6 +37,19 @@ class PaintersConfigurer:
         self.bullet_painter.add(bullet_creator.get_objects())
         self.ui_painter.add(ui_creator.get_objects())
 
+    def __bool__(self):
+        painters = (
+            self.ui_painter,
+            self.bullet_painter,
+            self.enemy_painter,
+            self.object_painter,
+        )
+        for painter in painters:
+            if painter is None:
+                return False
+
+        return True
+
     def add(self, level: ObjectPaintLevel, objects: list[GameObject]):
         match (level):
             case ObjectPaintLevel.ui:
